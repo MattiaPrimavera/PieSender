@@ -16,7 +16,9 @@ import android.widget.TextView;
 
 
 import com.xtech.sultano.optimizedfilesender.dummy.DummyContent;
+import com.xtech.sultano.optimizedfilesender.model.Model.Model;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -67,16 +69,19 @@ public class FileEntryListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+        Model model = new Model();
+        File f = new File("/sdcard/");
+        List<File> fileList = model.getAllFiles(f);
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(fileList));
     }
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private final List<DummyContent.DummyItem> mValues;
+        private final List<File> mValues;
 
-        public SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items) {
-            mValues = items;
+        public SimpleItemRecyclerViewAdapter(List<File> files) {
+            mValues = files;
         }
 
         @Override
@@ -89,27 +94,27 @@ public class FileEntryListActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            holder.mIdView.setText(mValues.get(position).getName());
+            holder.mContentView.setText(Integer.toString((int) mValues.get(position).getTotalSpace()));
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mTwoPane) {
+                    if (mTwoPane) {/*
                         Bundle arguments = new Bundle();
                         arguments.putString(FileEntryDetailFragment.ARG_ITEM_ID, holder.mItem.id);
                         FileEntryDetailFragment fragment = new FileEntryDetailFragment();
                         fragment.setArguments(arguments);
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.fileentry_detail_container, fragment)
-                                .commit();
-                    } else {
+                                .commit();*/
+                    } else {/*
                         Context context = v.getContext();
                         Intent intent = new Intent(context, FileEntryDetailActivity.class);
                         intent.putExtra(FileEntryDetailFragment.ARG_ITEM_ID, holder.mItem.id);
 
                         context.startActivity(intent);
-                    }
+                    */}
                 }
             });
         }
@@ -123,7 +128,7 @@ public class FileEntryListActivity extends AppCompatActivity {
             public final View mView;
             public final TextView mIdView;
             public final TextView mContentView;
-            public DummyContent.DummyItem mItem;
+            public File mItem;
 
             public ViewHolder(View view) {
                 super(view);
