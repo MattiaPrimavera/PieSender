@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">OptimizedFileSender</string>
+    <string name="title_fileentry_detail">FileEntry Detail</string>
+</resources>
