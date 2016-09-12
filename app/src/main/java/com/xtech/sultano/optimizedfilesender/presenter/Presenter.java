@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.xtech.sultano.optimizedfilesender.Client.FileSender;
 import com.xtech.sultano.optimizedfilesender.FileArrayAdapter;
 import com.xtech.sultano.optimizedfilesender.R;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
@@ -84,7 +85,8 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
                 mFileLoader.onContentChanged();
             }
         } else { //Otherwise, we have clicked a file, so attempt to open it.
-            openFile(Uri.fromFile(fileClicked));
+
+//            openFile(Uri.fromFile(fileClicked));
         }
     }
 

@@ -5,7 +5,7 @@
     android:background="#33446A"
     tools:context=".MainActivity">
     <fragment android:id="@+id/file_list"
-        android:name="com.xtech.sultano.optimizedfilemanager.view.UiView"
+        android:name="com.xtech.sultano.optimizedfilesender.view.UiView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"/>
 </RelativeLayout>
