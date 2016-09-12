@@ -7,7 +7,7 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 
 public class ByteStream {
-    private static byte[] toByteArray(int in_int) {
+    public static byte[] toByteArray(int in_int) {
         byte a[] = new byte[4];
         for (int i=0; i < 4; i++) {
 

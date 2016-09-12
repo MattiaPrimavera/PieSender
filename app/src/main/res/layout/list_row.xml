@@ -11,7 +11,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_toRightOf="@id/imageView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/name_text_view"
@@ -32,6 +32,7 @@
             android:layout_width="match_parent"
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:visibility="visible"
+            android:max="100"
             android:id="@+id/send_progress_bar"
             />
     </LinearLayout>

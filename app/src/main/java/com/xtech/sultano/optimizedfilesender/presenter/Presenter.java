@@ -7,9 +7,11 @@ import android.content.Intent;
 import android.content.Loader;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.xtech.sultano.optimizedfilesender.Client.FileSender;
@@ -19,8 +21,14 @@ import com.xtech.sultano.optimizedfilesender.view.UiView;
 import com.xtech.sultano.optimizedfilesender.model.Model.Model;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.xtech.sultano.optimizedfilesender.Client.ByteStream.toStream;
 
 /**
  * The main job of the presenter is to marshall data to and from the view. Logic in the
@@ -72,7 +80,7 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
     public void listItemClicked(ListView l, View v, int position, long id) {
         //The file we clicked based on row position where we clicked.  I could probably word that better. :)
         File fileClicked = mFileArrayAdapter.getItem(position);
-
+        Log.d("TEST: filePath: ", fileClicked.getPath());
         if (fileClicked.isDirectory()) {
             //we are changing dirs, so save the previous dir as the one we are currently in.
             mModel.setmPreviousDir(mModel.getmCurrentDir());
@@ -85,10 +93,76 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
                 mFileLoader.onContentChanged();
             }
         } else { //Otherwise, we have clicked a file, so attempt to open it.
-
+            ProgressBar mProgress = (ProgressBar) v.findViewById(R.id.send_progress_bar);
+            Handler mHandler = new Handler();
+            // Start lengthy operation in a background thread
+            new Thread(new FileSenderRunnable(mProgress, mHandler, fileClicked.getPath())).start();
 //            openFile(Uri.fromFile(fileClicked));
         }
     }
+
+    public class FileSenderRunnable implements Runnable{
+        private Handler mHandler;
+        private ProgressBar mProgress;
+        private String filePath;
+
+        public FileSenderRunnable(ProgressBar mProgress, Handler mHandler, String filePath){
+            this.filePath = filePath;
+            this.mHandler = mHandler;
+            this.mProgress = mProgress;
+        }
+
+        public void run(){
+            try {
+                String host = "192.168.0.13";
+                int port = 8000;
+                Socket socket = new Socket(host, port);
+                OutputStream os = socket.getOutputStream();
+
+                int cnt_files = filePath.length();
+
+                // How many files?
+                toStream(os, 1);
+                String fileNameRaw = new File(filePath).getName();
+                String[] pathParts = fileNameRaw.split("/");
+                String fileName = pathParts[pathParts.length - 1];
+                toStream(os, fileName);
+
+                Log.d("TEST: sending", filePath);
+                byte b[]=new byte[1024];
+                InputStream is = new FileInputStream(filePath);
+                int numRead=0;
+                long totalRead = 0;
+
+                while ( ( numRead=is.read(b)) > 0) {
+                    os.write(b, 0, numRead);
+                    totalRead += numRead;
+                    int percentage = (int)((totalRead * 100) / cnt_files);
+                    // Update the progress bar
+                    mHandler.post(new ProgressUpdaterRunnable(mProgress, percentage));
+                }
+                os.flush();
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        public class ProgressUpdaterRunnable implements Runnable {
+            private int mProgressStatus;
+            private ProgressBar mProgress;
+
+            public ProgressUpdaterRunnable(ProgressBar mProgress, int mProgressStatus){
+                this.mProgress = mProgress;
+                this.mProgressStatus = mProgressStatus;
+            }
+
+            public void run(){
+                mProgress.setProgress(mProgressStatus);
+            }
+        }
+    }
+
 
     //Called when settings is clicked from UIView menu.
     public void settings() {

@@ -12,9 +12,17 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.xtech.sultano.optimizedfilesender.Client.ByteStream;
 import com.xtech.sultano.optimizedfilesender.R;
 import com.xtech.sultano.optimizedfilesender.presenter.Presenter;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+
+import static com.xtech.sultano.optimizedfilesender.Client.ByteStream.toStream;
 import static java.lang.Thread.sleep;
 
 public class UiView extends ListFragment {
@@ -44,57 +52,11 @@ public class UiView extends ListFragment {
         setPresenter(new Presenter(this));
     }
 
-    public class FileSenderRunnable implements Runnable{
-        private int mProgressStatus;
-        private Handler mHandler;
-        private ProgressBar mProgress;
-
-        public FileSenderRunnable(ProgressBar mProgress, Handler mHandler){
-            this.mProgressStatus = 0;
-            this.mHandler = mHandler;
-            this.mProgress = mProgress;
-        }
-
-        public void run(){
-            while (mProgressStatus < 100) {
-                try {
-                    sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                mProgressStatus += 5;
-
-                // Update the progress bar
-                mHandler.post(new ProgressUpdaterRunnable(mProgress, mProgressStatus));
-            }
-        }
-
-        public class ProgressUpdaterRunnable implements Runnable {
-            private int mProgressStatus;
-            private ProgressBar mProgress;
-
-            public ProgressUpdaterRunnable(ProgressBar mProgress, int mProgressStatus){
-                this.mProgress = mProgress;
-                this.mProgressStatus = mProgressStatus;
-            }
-
-            public void run(){
-                mProgress.setProgress(mProgressStatus);
-            }
-        }
-    }
 
     //When we intercept a click, call through to the appropriate method in the presenter.
     @Override
     public void onListItemClick(ListView listView, android.view.View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
-        ProgressBar mProgress = (ProgressBar) view.findViewById(R.id.send_progress_bar);
-        Handler mHandler = new Handler();
-
-        // Start lengthy operation in a background thread
-        new Thread(new FileSenderRunnable(mProgress, mHandler)).start();
-
-
         presenter.listItemClicked(listView, view, position, id);
     }
 
