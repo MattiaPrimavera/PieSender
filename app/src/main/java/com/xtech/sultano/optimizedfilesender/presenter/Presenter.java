@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.xtech.sultano.optimizedfilesender.Client.ByteStream.toStream;
+import static java.lang.Thread.sleep;
 
 /**
  * The main job of the presenter is to marshall data to and from the view. Logic in the
@@ -119,13 +120,16 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
                 Socket socket = new Socket(host, port);
                 OutputStream os = socket.getOutputStream();
 
-                int cnt_files = filePath.length();
+                long cnt_files = new File(filePath).length();
 
                 // How many files?
                 toStream(os, 1);
                 String fileNameRaw = new File(filePath).getName();
-                String[] pathParts = fileNameRaw.split("/");
-                String fileName = pathParts[pathParts.length - 1];
+                String fileName = fileNameRaw;
+                if(fileNameRaw.indexOf('/') != 0) {
+                    String[] pathParts = fileNameRaw.split("/");
+                    fileName = pathParts[pathParts.length - 1];
+                }
                 toStream(os, fileName);
 
                 Log.d("TEST: sending", filePath);
@@ -137,11 +141,17 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
                 while ( ( numRead=is.read(b)) > 0) {
                     os.write(b, 0, numRead);
                     totalRead += numRead;
+                    Log.d("cnt_files: ", Long.toString(cnt_files));
+
+                    Log.d("Sent: ", Long.toString(totalRead));
                     int percentage = (int)((totalRead * 100) / cnt_files);
+                    Log.d("percentage: ", Integer.toString(percentage));
                     // Update the progress bar
+                    sleep(1);
                     mHandler.post(new ProgressUpdaterRunnable(mProgress, percentage));
                 }
                 os.flush();
+                Log.d("TEST:", " file successfully sent!!!!");
             }
             catch (Exception ex) {
                 ex.printStackTrace();

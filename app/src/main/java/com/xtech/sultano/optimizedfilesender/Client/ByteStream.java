@@ -1,5 +1,7 @@
 package com.xtech.sultano.optimizedfilesender.Client;
 
+import android.util.Log;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.File;
@@ -7,7 +9,7 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 
 public class ByteStream {
-    public static byte[] toByteArray(int in_int) {
+    private static byte[] toByteArray(int in_int) {
         byte a[] = new byte[4];
         for (int i=0; i < 4; i++) {
 
@@ -97,18 +99,25 @@ public class ByteStream {
             java.io.FileNotFoundException,
             java.io.IOException {
 
+        System.out.println("writing to file...");
         byte[] buffer = new byte[buf_size];
 
         int       len_read=0;
         int total_len_read=0;
 
-        while ( total_len_read + buf_size <= len) {
+        while ( total_len_read <= len) {
             len_read = ins.read(buffer);
             total_len_read += len_read;
             fos.write(buffer, 0, len_read);
+            if(len - total_len_read == 0){
+                System.out.println(len - total_len_read + " missin ...");
+                return;
+            }
+            System.out.println(len - total_len_read + " missin ...");
         }
 
         if (total_len_read < len) {
+            System.out.println("calling toFile again ...");
             toFile(ins, fos, len-total_len_read, buf_size/2);
         }
     }
@@ -127,6 +136,7 @@ public class ByteStream {
             java.io.IOException {
 
         int len = toInt(ins);
+        System.out.println("FileSize: " + Integer.toString(len));
         toFile(ins, file, len);
     }
 
@@ -139,10 +149,12 @@ public class ByteStream {
         byte b[]=new byte[1024];
         InputStream is = new FileInputStream(file);
         int numRead=0;
-
+        long total = 0;
         while ( ( numRead=is.read(b)) > 0) {
+            total += numRead;
             os.write(b, 0, numRead);
         }
+        Log.d("TEST:", "total: " + Long.toString(numRead) );
         os.flush();
     }
 }
