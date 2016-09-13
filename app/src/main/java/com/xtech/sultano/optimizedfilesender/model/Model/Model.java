@@ -24,10 +24,7 @@ public class Model {
     private void init() {
         mHistory = new Stack<>();
 
-    /*
-        check if the device's storage is read/write accessible. BLOCKING
-    */
-
+        /* check if the device's storage is read/write accessible. BLOCKING */
         //if the storage device is writable and readable, set the current directory to the external storage location.
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             mCurrentDir = Environment.getExternalStorageDirectory();
@@ -83,9 +80,7 @@ public class Model {
         Collections.sort(dirs);
         Collections.sort(files);
 
-        /*
-            Merge file and directory collection objects
-        */
+        /* Merge file and directory collection objects */
         dirs.addAll(files);
         return dirs;
     }
@@ -93,11 +88,8 @@ public class Model {
     //Try to determine the mime type of a file based on extension.
     public String getMimeType(Uri uri) {
         String mimeType = null;
-
         String extension = MimeTypeMap.getFileExtensionFromUrl(uri.getPath());
-
         if (MimeTypeMap.getSingleton().hasExtension(extension)) {
-
             mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
         }
         return mimeType;

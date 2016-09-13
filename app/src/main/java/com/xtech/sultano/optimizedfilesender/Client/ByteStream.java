@@ -1,14 +1,31 @@
 package com.xtech.sultano.optimizedfilesender.Client;
 
 import android.util.Log;
+import android.widget.ProgressBar;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
+import java.nio.ByteBuffer;
 
 public class ByteStream {
+    private static ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+
+    public static byte[] longToBytes(long x) {
+        buffer.putLong(0, x);
+        return buffer.array();
+    }
+
+    public static long bytesToLong(byte[] bytes) {
+        long value = 0;
+        for (int i = 0; i < bytes.length; i++){
+            value = (value << 8) + (bytes[i] & 0xff);
+        }
+        return value;
+    }
+
     private static byte[] toByteArray(int in_int) {
         byte a[] = new byte[4];
         for (int i=0; i < 4; i++) {
@@ -33,6 +50,10 @@ public class ByteStream {
         return ret;
     }
 
+    private static long toLong(byte[] byte_array_8) {
+        return bytesToLong(byte_array_8);
+    }
+
     public static int toInt(InputStream in) throws java.io.IOException {
         byte[] byte_array_4 = new byte[4];
 
@@ -42,6 +63,21 @@ public class ByteStream {
         byte_array_4[3] = (byte) in.read();
 
         return toInt(byte_array_4);
+    }
+
+    public static long toLong(InputStream in) throws java.io.IOException {
+        byte[] byte_array_8 = new byte[8];
+
+        byte_array_8[0] = (byte) in.read();
+        byte_array_8[1] = (byte) in.read();
+        byte_array_8[2] = (byte) in.read();
+        byte_array_8[3] = (byte) in.read();
+        byte_array_8[4] = (byte) in.read();
+        byte_array_8[5] = (byte) in.read();
+        byte_array_8[6] = (byte) in.read();
+        byte_array_8[7] = (byte) in.read();
+
+        return toLong(byte_array_8);
     }
 
     public static String toString(InputStream ins) throws java.io.IOException {
@@ -59,6 +95,12 @@ public class ByteStream {
 
     public static void toStream(OutputStream os, int i) throws java.io.IOException {
         byte [] byte_array_4 = toByteArray(i);
+        os.write(byte_array_4);
+    }
+
+    public static void toStream(OutputStream os, long i) throws java.io.IOException {
+        Log.d("TEST: size long: ", Long.toString(i));
+        byte [] byte_array_4 = longToBytes(i);
         os.write(byte_array_4);
     }
 
@@ -95,7 +137,7 @@ public class ByteStream {
         return ret;
     }
 
-    private static void toFile(InputStream ins, FileOutputStream fos, int len, int buf_size) throws
+    private static void toFile(InputStream ins, FileOutputStream fos, long len, int buf_size) throws
             java.io.FileNotFoundException,
             java.io.IOException {
 
@@ -103,26 +145,26 @@ public class ByteStream {
         byte[] buffer = new byte[buf_size];
 
         int       len_read=0;
-        int total_len_read=0;
+        long total_len_read=0;
 
         while ( total_len_read <= len) {
             len_read = ins.read(buffer);
             total_len_read += len_read;
             fos.write(buffer, 0, len_read);
             if(len - total_len_read == 0){
-                System.out.println(len - total_len_read + " missin ...");
+                //System.out.println(len - total_len_read + " missin ...");
                 return;
             }
             System.out.println(len - total_len_read + " missin ...");
         }
 
-        if (total_len_read < len) {
+        /*if (total_len_read < len) {
             System.out.println("calling toFile again ...");
             toFile(ins, fos, len-total_len_read, buf_size/2);
-        }
+        }*/
     }
 
-    private static void toFile(InputStream ins, File file, int len) throws
+    private static void toFile(InputStream ins, File file, long len) throws
             java.io.FileNotFoundException,
             java.io.IOException {
 
@@ -135,16 +177,17 @@ public class ByteStream {
             java.io.FileNotFoundException,
             java.io.IOException {
 
-        int len = toInt(ins);
-        System.out.println("FileSize: " + Integer.toString(len));
+        long len = toLong(ins);
+        System.out.println("FileSize: " + Long.toString(len));
         toFile(ins, file, len);
     }
 
-    public static void toStream(OutputStream os, File file)
+    public static void toStream(OutputStream os, File file, ProgressBar mProgress)
             throws java.io.FileNotFoundException,
             java.io.IOException{
 
-        toStream(os, (int) file.length());
+        Log.d("TEST: file length: ", Long.toString(file.length()));
+        toStream(os, file.length());
 
         byte b[]=new byte[1024];
         InputStream is = new FileInputStream(file);
@@ -154,7 +197,8 @@ public class ByteStream {
             total += numRead;
             os.write(b, 0, numRead);
         }
-        Log.d("TEST:", "total: " + Long.toString(numRead) );
+        Log.d("TEST:", "total: " + Long.toString(total) );
         os.flush();
+        Log.d("TEST:", "file correctly sent!");
     }
 }

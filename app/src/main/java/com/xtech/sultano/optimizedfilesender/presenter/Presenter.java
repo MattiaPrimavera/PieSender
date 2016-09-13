@@ -13,23 +13,14 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import com.xtech.sultano.optimizedfilesender.Client.FileSender;
 import com.xtech.sultano.optimizedfilesender.FileArrayAdapter;
 import com.xtech.sultano.optimizedfilesender.R;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
 import com.xtech.sultano.optimizedfilesender.model.Model.Model;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.xtech.sultano.optimizedfilesender.Client.ByteStream.toStream;
-import static java.lang.Thread.sleep;
 
 /**
  * The main job of the presenter is to marshall data to and from the view. Logic in the
@@ -53,9 +44,7 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
 
     private void init() {
         //Instantiate and configure the file adapter with an empty list that our loader will update..
-        mFileArrayAdapter = new FileArrayAdapter(mView.getActivity(),
-                R.layout.list_row, mData);
-
+        mFileArrayAdapter = new FileArrayAdapter(mView.getActivity(), R.layout.list_row, mData);
         mView.setListAdapter(mFileArrayAdapter);
 
         /*
@@ -98,7 +87,6 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
             Handler mHandler = new Handler();
             // Start lengthy operation in a background thread
             new Thread(new FileSenderRunnable(mProgress, mHandler, fileClicked.getPath())).start();
-//            openFile(Uri.fromFile(fileClicked));
         }
     }
 
@@ -115,60 +103,10 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
 
         public void run(){
             try {
-                String host = "192.168.0.13";
-                int port = 8000;
-                Socket socket = new Socket(host, port);
-                OutputStream os = socket.getOutputStream();
-
-                long cnt_files = new File(filePath).length();
-
-                // How many files?
-                toStream(os, 1);
-                String fileNameRaw = new File(filePath).getName();
-                String fileName = fileNameRaw;
-                if(fileNameRaw.indexOf('/') != 0) {
-                    String[] pathParts = fileNameRaw.split("/");
-                    fileName = pathParts[pathParts.length - 1];
-                }
-                toStream(os, fileName);
-
-                Log.d("TEST: sending", filePath);
-                byte b[]=new byte[1024];
-                InputStream is = new FileInputStream(filePath);
-                int numRead=0;
-                long totalRead = 0;
-
-                while ( ( numRead=is.read(b)) > 0) {
-                    os.write(b, 0, numRead);
-                    totalRead += numRead;
-                    Log.d("cnt_files: ", Long.toString(cnt_files));
-
-                    Log.d("Sent: ", Long.toString(totalRead));
-                    int percentage = (int)((totalRead * 100) / cnt_files);
-                    Log.d("percentage: ", Integer.toString(percentage));
-                    // Update the progress bar
-                    sleep(1);
-                    mHandler.post(new ProgressUpdaterRunnable(mProgress, percentage));
-                }
-                os.flush();
-                Log.d("TEST:", " file successfully sent!!!!");
-            }
-            catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        public class ProgressUpdaterRunnable implements Runnable {
-            private int mProgressStatus;
-            private ProgressBar mProgress;
-
-            public ProgressUpdaterRunnable(ProgressBar mProgress, int mProgressStatus){
-                this.mProgress = mProgress;
-                this.mProgressStatus = mProgressStatus;
-            }
-
-            public void run(){
-                mProgress.setProgress(mProgressStatus);
+                FileSender file = new FileSender(8000, "localhost", mProgress);
+                file.sendFiles(filePath);
+            }catch(Exception e){
+                e.printStackTrace();
             }
         }
     }
@@ -224,7 +162,6 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
     @Override
     public Loader<List<File>> onCreateLoader(int id, Bundle args) {
         mFileLoader = new AsyncTaskLoader<List<File>>(mView.getActivity()) {
-
             //Get our new data load.
             @Override
             public List<File> loadInBackground() {
@@ -232,16 +169,13 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
                 return mModel.getAllFiles(mModel.getmCurrentDir());
             }
         };
-
         return mFileLoader;
     }
 
     //Called when the loader has finished acquiring its load.
     @Override
     public void onLoadFinished(Loader<List<File>> loader, List<File> data) {
-
         this.mData = data;
-
         /* My data source has changed so now the adapter needs to be reset to reflect the changes
         in the ListView.*/
         updateAdapter(data);
