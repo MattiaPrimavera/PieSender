@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import com.xtech.sultano.optimizedfilesender.Client.ByteStream;
 import com.xtech.sultano.optimizedfilesender.R;
 import com.xtech.sultano.optimizedfilesender.presenter.Presenter;
+import com.xtech.sultano.optimizedfilesender.presenter.PresenterFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,7 +51,8 @@ public class UiView extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setPresenter(new Presenter(this));
+        PresenterFactory<Presenter> presenterFactory = new PresenterFactory<>();
+        setPresenter(presenterFactory.create(this));
     }
 
     public void onBackPressed(){
@@ -88,5 +90,15 @@ public class UiView extends ListFragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 }

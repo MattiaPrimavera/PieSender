@@ -3,6 +3,7 @@ package com.xtech.sultano.optimizedfilesender.presenter;
 import android.app.LoaderManager;
 import android.content.ActivityNotFoundException;
 import android.content.AsyncTaskLoader;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.net.Uri;
@@ -34,14 +35,15 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
     private Model mModel; //Our model.
     private FileArrayAdapter mFileArrayAdapter; //The adapter containing data for our list.
     private List<File> mData; //The list of all files for a specific dir.
+    private final int LOADER_ID = 101;
     private AsyncTaskLoader<List<File>> mFileLoader; /*Loads the list of files from the model in
     a background thread.*/
 
-    public Presenter(UiView mView) {
+    public Presenter(UiView mView, Model mModel) {
         this.mView = mView;
-        mModel = new Model();
-        mData = new ArrayList<>();
-        init();
+        this.mModel = mModel;
+        this.mData = new ArrayList<>();
+        this.init();
     }
 
     private void init() {
@@ -53,10 +55,16 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
             Start the AsyncTaskLoader that will update the adapter for
             the ListView. We update the adapter in the onLoadFinished() callback.
         */
-        mView.getActivity().getLoaderManager().initLoader(0, null, this);
+        LoaderManager loaderManager = mView.getActivity().getLoaderManager();
+        final Loader<Object> loader = loaderManager.getLoader(LOADER_ID);
+        if (loader != null && loader.isReset()) {
+            loaderManager.restartLoader(LOADER_ID, null, this);
+        } else {
+            loaderManager.initLoader(LOADER_ID, null, this);
+        }
 
         //Grab our first list of results from our loader.  onFinishLoad() will call updataAdapter().
-        mFileLoader.forceLoad();
+        //mFileLoader = new FileLoader(mView.getActivity());
     }
 
     /*Called to update the Adapter with a new list of files when mCurrentDir changes.*/
@@ -141,15 +149,8 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
     //Loader callbacks.
     @Override
     public Loader<List<File>> onCreateLoader(int id, Bundle args) {
-        mFileLoader = new AsyncTaskLoader<List<File>>(mView.getActivity()) {
-            //Get our new data load.
-            @Override
-            public List<File> loadInBackground() {
-                Log.i("Loader", "loadInBackground()");
-                return mModel.getAllFiles(mModel.getmCurrentDir());
-            }
-        };
-        return mFileLoader;
+        this.mFileLoader = new FileLoader(mView.getActivity());
+        return this.mFileLoader;
     }
 
     //Called when the loader has finished acquiring its load.
@@ -164,5 +165,6 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
     @Override
     public void onLoaderReset(Loader<List<File>> loader) {
         //not used for this data source.
+        this.mFileArrayAdapter.clear();
     }
 }
