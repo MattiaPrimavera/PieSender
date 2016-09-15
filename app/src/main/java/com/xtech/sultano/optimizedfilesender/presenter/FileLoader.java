@@ -2,6 +2,7 @@ package com.xtech.sultano.optimizedfilesender.presenter;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+
 import com.xtech.sultano.optimizedfilesender.model.Model.Model;
 import java.io.File;
 import java.util.List;
@@ -20,9 +21,14 @@ public class FileLoader extends AsyncTaskLoader<List<File>> {
      *
      * @param context used to retrieve the application context.
      */
-    public FileLoader(Context context) {
+    public FileLoader(Context context, Model mModel) {
         super(context);
-        mModel = new Model();
+        this.mModel = mModel;
+    }
+
+    @Override
+    public void onContentChanged(){
+        this.forceLoad();
     }
 
     @Override

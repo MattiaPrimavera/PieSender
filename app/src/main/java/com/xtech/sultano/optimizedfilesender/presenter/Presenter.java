@@ -56,8 +56,8 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
             the ListView. We update the adapter in the onLoadFinished() callback.
         */
         LoaderManager loaderManager = mView.getActivity().getLoaderManager();
-        final Loader<Object> loader = loaderManager.getLoader(LOADER_ID);
-        if (loader != null && loader.isReset()) {
+        mFileLoader = (AsyncTaskLoader)loaderManager.getLoader(LOADER_ID);
+        if (mFileLoader != null && mFileLoader.isReset()) {
             loaderManager.restartLoader(LOADER_ID, null, this);
         } else {
             loaderManager.initLoader(LOADER_ID, null, this);
@@ -87,7 +87,6 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
 
             //set the current dir to the dir we clicked in the listview.
             mModel.setmCurrentDir(fileClicked);
-
             //Let the loader know that our content has changed and we need a new load.
             if (mFileLoader.isStarted()) {
                 mFileLoader.onContentChanged();
@@ -149,7 +148,7 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
     //Loader callbacks.
     @Override
     public Loader<List<File>> onCreateLoader(int id, Bundle args) {
-        this.mFileLoader = new FileLoader(mView.getActivity());
+        this.mFileLoader = new FileLoader(mView.getActivity(), mModel);
         return this.mFileLoader;
     }
 
