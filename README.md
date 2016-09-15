@@ -2,7 +2,7 @@
 ## To Read On
 - [Android Databinding: Goodbye Presenter, hello ViewModel!](http://tech.vg.no/2015/07/17/android-databinding-goodbye-presenter-hello-viewmodel/)
 - [Android Code That Scales, With MVP](http://engineering.remind.com/android-code-that-scales/)
-- [https://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView](https://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView)
+- [Using an ArrayAdapter with ListView](https://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView)
 
 ## Sources
 For what it concerns MVP pattern:
