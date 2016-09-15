@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="#33446A" android:paddingLeft="10dip" android:paddingRight="10dip">
+    android:background="@android:color/black"
+    android:layout_marginTop="1dp"
+    android:paddingBottom="10dip"
+    android:paddingLeft="10dip" android:paddingRight="10dip">
+
     <ImageView
         android:id="@+id/imageView"
         android:orientation="vertical"
@@ -10,6 +14,7 @@
         android:layout_alignParentLeft="true"/>
     <LinearLayout
         android:orientation="vertical"
+        android:layout_marginLeft="10dip"
         android:layout_toRightOf="@id/imageView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
