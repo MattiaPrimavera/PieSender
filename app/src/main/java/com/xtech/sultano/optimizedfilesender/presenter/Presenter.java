@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.xtech.sultano.optimizedfilesender.Client.FileSender;
+import com.xtech.sultano.optimizedfilesender.Client.FileSenderRunnable;
 import com.xtech.sultano.optimizedfilesender.FileArrayAdapter;
 import com.xtech.sultano.optimizedfilesender.R;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
@@ -90,28 +91,6 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
             new Thread(new FileSenderRunnable(mProgress, mHandler, fileClicked.getPath())).start();
         }
     }
-
-    public class FileSenderRunnable implements Runnable{
-        private Handler mHandler;
-        private ProgressBar mProgress;
-        private String filePath;
-
-        public FileSenderRunnable(ProgressBar mProgress, Handler mHandler, String filePath){
-            this.filePath = filePath;
-            this.mHandler = mHandler;
-            this.mProgress = mProgress;
-        }
-
-        public void run(){
-            try {
-                FileSender file = new FileSender(8000, "localhost", mProgress);
-                file.sendFiles(filePath);
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-        }
-    }
-
 
     //Called when settings is clicked from UIView menu.
     public void settings() {
