@@ -7,3 +7,4 @@
 - [Bytes -> Long  Conversion](http://stackoverflow.com/questions/1026761/how-to-convert-a-byte-array-to-its-numeric-value-java)
 - [Long -> Bytes Conversion](http://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java)
 - [Network Discovery](http://michieldemey.be/blog/network-discovery-using-udp-broadcast/)
+- [Async Task Loaders](https://developer.android.com/reference/android/content/AsyncTaskLoader.html)
