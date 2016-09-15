@@ -1,6 +1,7 @@
 package com.xtech.sultano.optimizedfilesender;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
 
 import com.xtech.sultano.optimizedfilesender.view.UiView;
@@ -14,5 +15,11 @@ public class MainActivity extends Activity {
         //getActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.activity_main);
         mView = (UiView) getFragmentManager().findFragmentById(R.id.file_list);
+    }
+
+    @Override
+    public void onBackPressed() {
+        UiView listFragment = (UiView)getFragmentManager().findFragmentById(R.id.file_list);
+        listFragment.onBackPressed();
     }
 }

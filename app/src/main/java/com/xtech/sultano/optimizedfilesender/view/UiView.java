@@ -52,6 +52,9 @@ public class UiView extends ListFragment {
         setPresenter(new Presenter(this));
     }
 
+    public void onBackPressed(){
+        presenter.homePressed();
+    }
 
     //When we intercept a click, call through to the appropriate method in the presenter.
     @Override
