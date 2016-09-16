@@ -48,7 +48,7 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
         mFileArrayAdapter = new FileArrayAdapter(mView.getActivity(), R.layout.list_row, mData);
         mView.setListAdapter(mFileArrayAdapter);
 
-        //this.startLoader();
+        this.startLoader();
         //Grab our first list of results from our loader.  onFinishLoad() will call updataAdapter().
         //mFileLoader = new FileLoader(mView.getActivity());
     }
@@ -87,6 +87,8 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
             //set the current dir to the dir we clicked in the listview.
             mModel.setmCurrentDir(fileClicked);
             //Let the loader know that our content has changed and we need a new load.
+            if(mFileLoader == null)
+                this.startLoader();
             if (mFileLoader.isStarted()) {
                 mFileLoader.onContentChanged();
             }
