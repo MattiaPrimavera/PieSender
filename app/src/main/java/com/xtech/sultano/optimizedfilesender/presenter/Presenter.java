@@ -1,13 +1,13 @@
 package com.xtech.sultano.optimizedfilesender.presenter;
 
-import android.app.LoaderManager;
 import android.content.ActivityNotFoundException;
-import android.content.AsyncTaskLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -33,7 +33,7 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
     private FileArrayAdapter mFileArrayAdapter; //The adapter containing data for our list.
     private List<File> mData; //The list of all files for a specific dir.
     private final int LOADER_ID = 101;
-    private AsyncTaskLoader<List<File>> mFileLoader; /*Loads the list of files from the model in
+    private FileLoader mFileLoader; /*Loads the list of files from the model in
     a background thread.*/
 
     public Presenter(UiView mView, Model mModel) {
@@ -48,20 +48,23 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
         mFileArrayAdapter = new FileArrayAdapter(mView.getActivity(), R.layout.list_row, mData);
         mView.setListAdapter(mFileArrayAdapter);
 
+        //this.startLoader();
+        //Grab our first list of results from our loader.  onFinishLoad() will call updataAdapter().
+        //mFileLoader = new FileLoader(mView.getActivity());
+    }
+
+    private void startLoader(){
         /*
             Start the AsyncTaskLoader that will update the adapter for
             the ListView. We update the adapter in the onLoadFinished() callback.
         */
-        LoaderManager loaderManager = mView.getActivity().getLoaderManager();
-        mFileLoader = (AsyncTaskLoader)loaderManager.getLoader(LOADER_ID);
-        if (mFileLoader != null && mFileLoader.isReset()) {
+        LoaderManager loaderManager = mView.getActivity().getSupportLoaderManager();
+        Loader loader = loaderManager.getLoader(LOADER_ID);
+        if (loader != null && loader.isReset()) {
             loaderManager.restartLoader(LOADER_ID, null, this);
         } else {
             loaderManager.initLoader(LOADER_ID, null, this);
         }
-
-        //Grab our first list of results from our loader.  onFinishLoad() will call updataAdapter().
-        //mFileLoader = new FileLoader(mView.getActivity());
     }
 
     /*Called to update the Adapter with a new list of files when mCurrentDir changes.*/
@@ -77,11 +80,10 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
     public void listItemClicked(ListView l, View v, int position, long id) {
         //The file we clicked based on row position where we clicked.  I could probably word that better. :)
         File fileClicked = mFileArrayAdapter.getItem(position);
-        Log.d("TEST: filePath: ", fileClicked.getPath());
+        
         if (fileClicked.isDirectory()) {
             //we are changing dirs, so save the previous dir as the one we are currently in.
             mModel.setmPreviousDir(mModel.getmCurrentDir());
-
             //set the current dir to the dir we clicked in the listview.
             mModel.setmCurrentDir(fileClicked);
             //Let the loader know that our content has changed and we need a new load.
@@ -103,7 +105,6 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
 
     //Fires intents to handle files of known mime types.
     private void openFile(Uri fileUri) {
-
         String mimeType = mModel.getMimeType(fileUri);
 
         if (mimeType != null) { //we have determined a mime type and can probably handle the file.
@@ -160,7 +161,10 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
 
     @Override
     public void onLoaderReset(Loader<List<File>> loader) {
-        //not used for this data source.
         this.mFileArrayAdapter.clear();
+    }
+
+    public void onResume(){
+        this.startLoader();
     }
 }

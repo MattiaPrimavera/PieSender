@@ -96,4 +96,10 @@ public class UiView extends ListFragment {
     public void onStart() {
         super.onStart();
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        presenter.onResume();
+    }
 }
