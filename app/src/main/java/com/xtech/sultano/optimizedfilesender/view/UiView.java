@@ -1,8 +1,8 @@
 package com.xtech.sultano.optimizedfilesender.view;
 
-import android.app.ListFragment;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ListFragment;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,6 +40,15 @@ public class UiView extends ListFragment {
         setHasOptionsMenu(true);
     }
 
+    /**
+     * Returns a new instance of this fragment for the given section
+     * number.
+     */
+    public static UiView newInstance() {
+
+        UiView fragment = new UiView();
+        return fragment;
+    }
 
     //Return the view to the Activity for display.
     @Override

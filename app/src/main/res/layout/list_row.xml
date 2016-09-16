@@ -37,6 +37,7 @@
             android:layout_width="match_parent"
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:visibility="visible"
+            android:progressDrawable="@drawable/circular_progress_bar"
             android:max="100"
             android:id="@+id/send_progress_bar"
             />
