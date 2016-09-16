@@ -4,15 +4,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-
-import com.xtech.sultano.optimizedfilesender.R;
-import com.xtech.sultano.optimizedfilesender.view.UiView;
-
 import java.util.ArrayList;
 
 /**
@@ -96,8 +90,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText("CIAO");
             return rootView;
         }
     }
