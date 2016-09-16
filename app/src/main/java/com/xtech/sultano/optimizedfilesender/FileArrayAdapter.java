@@ -65,6 +65,7 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
         if (file.isDirectory()) {
             iv.setImageResource(R.drawable.folder);
         } else {
+            setFileTypeIcon(iv, file);
             iv.setImageResource(R.drawable.pdf);
             if (file.length() > 0) {
                 detailsView.setText(String.valueOf(file.length()));
@@ -76,5 +77,17 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
 
         //Send the view back so the ListView can show it as a row, the way we modified it.
         return v;
+    }
+
+    public void setFileTypeIcon(ImageView icon, File file){
+        String fileName = file.getName();
+        Context context = icon.getContext();
+        int id = R.drawable.raw;
+        if(fileName.indexOf('.') >= 0) {
+            String[] parts = fileName.split(".");
+            if(parts.length - 1 > 0)
+                id = context.getResources().getIdentifier(parts[parts.length - 1], "drawable", context.getPackageName());
+        }
+        icon.setImageResource(id);
     }
 }
