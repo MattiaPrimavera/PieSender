@@ -3,7 +3,7 @@
 - [Android Databinding: Goodbye Presenter, hello ViewModel!](http://tech.vg.no/2015/07/17/android-databinding-goodbye-presenter-hello-viewmodel/)
 - [Android Code That Scales, With MVP](http://engineering.remind.com/android-code-that-scales/)
 - [Using an ArrayAdapter with ListView](https://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView)
-
+- [AVLoadingIndicatorView](https://github.com/81813780/AVLoadingIndicatorView)
 ## Sources
 For what it concerns MVP pattern:
 - [MVP for Android: how to organize the presentation layer](http://antonioleiva.com/mvp-android/)
