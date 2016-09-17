@@ -1,7 +1,11 @@
 package com.xtech.sultano.optimizedfilesender.Client;
 
+import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
+
+import com.xtech.sultano.optimizedfilesender.presenter.Presenter;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -14,12 +18,16 @@ public class FileSender {
     // host and port of receiver
     private int port;
     private String host;
-    private ProgressBar mProgress;
+    private View rowView;
+    private Presenter presenter;
+    private Handler mHandler;
 
-    public FileSender(int port, String host, ProgressBar mProgress){
+    public FileSender(int port, String host, Presenter presenter, View rowView, Handler mHandler){
         this.port = 8000;
         this.host = "192.168.0.13";
-        this.mProgress = mProgress;
+        this.rowView = rowView;
+        this.presenter = presenter;
+        this.mHandler = mHandler;
     }
 
     public void sendFiles(String ...args){
@@ -47,7 +55,7 @@ public class FileSender {
                     os.write(b, 0, numRead);
 
                     int percentage = (int)((total * 100) / file.length());
-                    new Thread(new ProgressUpdaterRunnable(mProgress, percentage)).start();
+                    new Thread(new ProgressUpdaterRunnable(this.presenter, this.rowView, mHandler, percentage)).start();
                 }
                 Log.d("TEST:", "total: " + Long.toString(total) );
                 os.flush();
@@ -61,15 +69,22 @@ public class FileSender {
 
     public class ProgressUpdaterRunnable implements Runnable {
         private int mProgressStatus;
-        private ProgressBar mProgress;
+        private View v;
+        private Handler mHandler;
 
-        public ProgressUpdaterRunnable(ProgressBar mProgress, int mProgressStatus){
-            this.mProgress = mProgress;
+        public ProgressUpdaterRunnable(Presenter presenter, View v, Handler mHandler, int mProgressStatus){
+            this.v = v;
+            this.mHandler = mHandler;
             this.mProgressStatus = mProgressStatus;
         }
 
         public void run(){
-            mProgress.setProgress(mProgressStatus);
+            // Update the progress bar
+            mHandler.post(new Runnable() {
+                public void run() {
+                    presenter.updateProgressBar(v, mProgressStatus);
+                }
+            });
         }
     }
 }

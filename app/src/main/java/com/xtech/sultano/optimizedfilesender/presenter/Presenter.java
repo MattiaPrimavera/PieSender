@@ -10,8 +10,10 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TableLayout;
 import android.widget.Toast;
 import com.xtech.sultano.optimizedfilesender.Client.FileSenderRunnable;
 import com.xtech.sultano.optimizedfilesender.FileArrayAdapter;
@@ -96,8 +98,16 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
             ProgressBar mProgress = (ProgressBar) v.findViewById(R.id.send_progress_bar);
             Handler mHandler = new Handler();
             // Start lengthy operation in a background thread
-            new Thread(new FileSenderRunnable(mProgress, mHandler, fileClicked.getPath())).start();
+            new Thread(new FileSenderRunnable(this, v, mHandler, fileClicked.getPath())).start();
         }
+    }
+
+    public void updateProgressBar(View v, float percentage){
+        float value = (float) (percentage / 100.0);
+        View bar1 = v.findViewById(R.id.myRectangleView);
+        View bar2 = v.findViewById(R.id.myRectangleView2);
+        bar1.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1 - value));
+        bar2.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, value));
     }
 
     //Called when settings is clicked from UIView menu.
