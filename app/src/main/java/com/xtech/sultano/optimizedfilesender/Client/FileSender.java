@@ -1,5 +1,6 @@
 package com.xtech.sultano.optimizedfilesender.Client;
 
+import android.icu.util.Output;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.ProgressBar;
 import com.xtech.sultano.optimizedfilesender.presenter.Presenter;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.*;
 import java.io.OutputStream;
@@ -37,8 +39,7 @@ public class FileSender {
 
     public long sendFile(String filePath, boolean updateView, boolean tree){
         try {
-            Socket socket = new Socket(host, port);
-            OutputStream os = socket.getOutputStream();
+            OutputStream os = this.establishConnection(host, port);
             int cnt_files = 1;
             File file = new File(filePath);
             long fileSize = file.length();
@@ -81,10 +82,34 @@ public class FileSender {
         }
     }
 
+    public OutputStream establishConnection(String host, int port){
+        Socket socket;
+        OutputStream os = null;
+        try {
+            socket = new Socket(host, port);
+            os = socket.getOutputStream();
+        } catch (java.net.ConnectException enet){
+            enet.printStackTrace();
+            // Start lengthy operation in a background thread
+            new Thread(new Runnable() {
+                public void run() {
+                    // Update the progress bar
+                    mHandler.post(new Runnable() {
+                        public void run() {
+                            presenter.makeToast("Connection refused from Server ... :(");
+                        }
+                    });
+                }
+            }).start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return os;
+    }
+
     public void sendFiles(String ...args){
         try {
-            Socket socket = new Socket(host, port);
-            OutputStream os = socket.getOutputStream();
+            OutputStream os = this.establishConnection(host, port);
             int cnt_files = args.length;
 
             // How many files?

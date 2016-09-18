@@ -116,10 +116,7 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
             new Thread(new FileSenderRunnable(this, rowView, mHandler, fileClicked.getPath())).start();
         }
         else { // Make a toast to warn the user!
-            CharSequence text = "No Network connections available :(";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(mContext, text, duration);
-            toast.show();
+            this.makeToast("No Network connections available :(");
         }
     }
 
@@ -139,6 +136,12 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
         View bar2 = v.findViewById(R.id.myRectangleView2);
         bar1.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1 - value));
         bar2.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, value));
+    }
+
+    public void makeToast(CharSequence text){
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(mContext, text, duration);
+        toast.show();
     }
 
     //Called when settings is clicked from UIView menu.
