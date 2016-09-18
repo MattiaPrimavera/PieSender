@@ -29,6 +29,8 @@ public class UiView extends ListFragment {
         setHasOptionsMenu(true);
     }
 
+    public Presenter getPresenter(){ return this.presenter; }
+
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -50,7 +52,7 @@ public class UiView extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         PresenterFactory<Presenter> presenterFactory = new PresenterFactory<>();
 
-        setPresenter(presenterFactory.create(this));
+        setPresenter(presenterFactory.create(getPresenter(), this, getContext()));
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override

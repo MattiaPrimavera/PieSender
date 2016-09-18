@@ -31,7 +31,7 @@ public class FileSenderRunnable implements Runnable{
                 fileSender.sendDirectory(filePath);
             }else{
                 fileSender = new FileSender(8000, "localhost", presenter, rowView, mHandler);
-                fileSender.sendFile(filePath, true);
+                fileSender.sendFile(filePath, true, false);
             }
         }catch(Exception e){
             e.printStackTrace();

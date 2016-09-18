@@ -1,7 +1,10 @@
 package com.xtech.sultano.optimizedfilesender.presenter;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,13 +39,15 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
     private FileArrayAdapter mFileArrayAdapter; //The adapter containing data for our list.
     private List<File> mData; //The list of all files for a specific dir.
     private final int LOADER_ID = 101;
+    private Context mContext;
     private FileLoader mFileLoader; /*Loads the list of files from the model in
     a background thread.*/
 
-    public Presenter(UiView mView, Model mModel) {
+    public Presenter(UiView mView, Model mModel, Context context) {
         this.mView = mView;
         this.mModel = mModel;
         this.mData = new ArrayList<>();
+        this.mContext = context;
         this.init();
     }
 
@@ -96,9 +101,25 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
                 mFileLoader.onContentChanged();
             }
         } else { //Otherwise, we have clicked a file, so attempt to open it.
+            this.createSendFileThread(v, fileClicked);
+        }
+    }
+
+    public void createSendFileThread(View rowView, File fileClicked){
+        // Check if network is available
+        boolean connected = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            // We're connected
             Handler mHandler = new Handler();
-            // Start lengthy operation in a background thread
-            new Thread(new FileSenderRunnable(this, v, mHandler, fileClicked.getPath())).start();
+            new Thread(new FileSenderRunnable(this, rowView, mHandler, fileClicked.getPath())).start();
+        }
+        else { // Make a toast to warn the user!
+            CharSequence text = "No Network connections available :(";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(mContext, text, duration);
+            toast.show();
         }
     }
 
@@ -107,9 +128,7 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
         File fileClicked = mFileArrayAdapter.getItem(position);
 
         if (fileClicked.isDirectory()) {
-            Handler mHandler = new Handler();
-            // Start lengthy operation in a background thread
-            new Thread(new FileSenderRunnable(this, v, mHandler, fileClicked.getPath())).start();
+            this.createSendFileThread(v, fileClicked);
         }
         return false;
     }

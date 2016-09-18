@@ -35,7 +35,7 @@ public class FileSender {
         this.mHandler = mHandler;
     }
 
-    public long sendFile(String filePath, boolean updateView){
+    public long sendFile(String filePath, boolean updateView, boolean tree){
         try {
             Socket socket = new Socket(host, port);
             OutputStream os = socket.getOutputStream();
@@ -46,9 +46,12 @@ public class FileSender {
             // How many files?
             ByteStream.toStream(os, cnt_files);
 
-
-            // Sending the filename
-            ByteStream.toStream(os, file.getName());
+            // Sending the filePath if needing to recreate same tree structure on destination machine
+            if(tree){
+                ByteStream.toStream(os, file.getPath());
+            }else {
+                ByteStream.toStream(os, file.getName());
+            }
 
             // Sending file length
             ByteStream.toStream(os, fileSize);
@@ -139,7 +142,7 @@ public class FileSender {
 
             for (int cur_file=0; cur_file<cnt_files; cur_file++) {
                 File file = allFiles.get(cur_file);
-                long total = this.sendFile(file.getPath(), false);
+                long total = this.sendFile(file.getPath(), false, true);
                 sleep(100);
                 Log.d("TEST: --> total: ", Long.toString(total));
                 //Log.d("TEST: file length: ", Long.toString(file.length()));
