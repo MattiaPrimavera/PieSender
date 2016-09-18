@@ -30,8 +30,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
+        mView = new UiView();
 
-        mSectionsPagerAdapter.addPage(new UiView(), "ONE");
+        mSectionsPagerAdapter.addPage(mView, "ONE");
         mSectionsPagerAdapter.addPage(new SectionsPagerAdapter.PlaceholderFragment(), "TWO");
         mViewPager.setAdapter(mSectionsPagerAdapter);
     }
@@ -56,14 +57,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
-        //mView = (UiView)getSupportFragmentManager().findFragmentById(R.id.file_list);
-        //mView.onBackPressed();
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            mView.onBackPressed();
         }
     }
 
