@@ -3,7 +3,8 @@
 - [Android Databinding: Goodbye Presenter, hello ViewModel!](http://tech.vg.no/2015/07/17/android-databinding-goodbye-presenter-hello-viewmodel/)
 - [Android Code That Scales, With MVP](http://engineering.remind.com/android-code-that-scales/)
 - [Using an ArrayAdapter with ListView](https://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView)
-- [AVLoadingIndicatorView](https://github.com/81813780/AVLoadingIndicatorView)
+- [AVLoadingIndicatorView](https://github.com/81813780/AVLoadingIndicatorView)  
+
 ## Sources
 For what it concerns MVP pattern:
 - [MVP for Android: how to organize the presentation layer](http://antonioleiva.com/mvp-android/)
@@ -16,6 +17,7 @@ Others:
 - [Long -> Bytes Conversion](http://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java)
 - [Network Discovery](http://michieldemey.be/blog/network-discovery-using-udp-broadcast/)
 - [Async Task Loaders](https://developer.android.com/reference/android/content/AsyncTaskLoader.html)
+- [Check connection available](http://stackoverflow.com/questions/5474089/how-to-check-currently-internet-connection-is-available-or-not-in-android)  
 
 Icons:
 - [Folder](http://www.flaticon.com/free-icon/folder_181524#term=folders&page=1&position=43)
