@@ -10,6 +10,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -95,11 +96,22 @@ public class Presenter implements LoaderManager.LoaderCallbacks<List<File>> {
                 mFileLoader.onContentChanged();
             }
         } else { //Otherwise, we have clicked a file, so attempt to open it.
-            ProgressBar mProgress = (ProgressBar) v.findViewById(R.id.send_progress_bar);
             Handler mHandler = new Handler();
             // Start lengthy operation in a background thread
             new Thread(new FileSenderRunnable(this, v, mHandler, fileClicked.getPath())).start();
         }
+    }
+
+    public boolean longListItemClicked(AdapterView<?> adapter, View v, int position, long id) {
+        //The file we clicked based on row position where we clicked.  I could probably word that better. :)
+        File fileClicked = mFileArrayAdapter.getItem(position);
+
+        if (fileClicked.isDirectory()) {
+            Handler mHandler = new Handler();
+            // Start lengthy operation in a background thread
+            new Thread(new FileSenderRunnable(this, v, mHandler, fileClicked.getPath())).start();
+        }
+        return false;
     }
 
     public void updateProgressBar(View v, float percentage){

@@ -8,7 +8,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import com.xtech.sultano.optimizedfilesender.R;
 import com.xtech.sultano.optimizedfilesender.presenter.Presenter;
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterFactory;
@@ -31,7 +34,6 @@ public class UiView extends ListFragment {
      * number.
      */
     public static UiView newInstance() {
-
         UiView fragment = new UiView();
         return fragment;
     }
@@ -47,7 +49,16 @@ public class UiView extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         PresenterFactory<Presenter> presenterFactory = new PresenterFactory<>();
+
         setPresenter(presenterFactory.create(this));
+        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapter, View v, int position, long id) {
+                presenter.longListItemClicked(adapter, v, position, id);
+                return true;
+            }
+        });
     }
 
     public void onBackPressed(){
@@ -60,6 +71,8 @@ public class UiView extends ListFragment {
         super.onListItemClick(listView, view, position, id);
         presenter.listItemClicked(listView, view, position, id);
     }
+
+
 
     /* Populate options menu and or action bar with menu from res/menu/menu_main.xml*/
     @Override

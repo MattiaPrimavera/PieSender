@@ -61,6 +61,25 @@ public class Model {
 
     }
 
+    public List<File> getAllFilePathsRecursively(File f){
+        File[] allFiles = f.listFiles();
+
+        List<File> files = new ArrayList<>();
+
+        for (File file : allFiles) {
+            if (file.isDirectory()) {
+                List<File> result = getAllFilePathsRecursively(file);
+                for(int i = 0; i < result.size(); i++){
+                    files.add(result.get(i));
+                }
+            } else {
+                files.add(file);
+            }
+        }
+        Collections.sort(files);
+        return files;
+    }
+
     //Returns a sorted list of all dirs and files in a given directory.
     public List<File> getAllFiles(File f) {
         File[] allFiles = f.listFiles();
