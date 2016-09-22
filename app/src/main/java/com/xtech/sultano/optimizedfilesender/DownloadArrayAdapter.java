@@ -7,34 +7,45 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.xtech.sultano.optimizedfilesender.model.Model.Download;
+
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
-public class FileArrayAdapter extends ArrayAdapter<File> {
+public class DownloadArrayAdapter extends ArrayAdapter<Download> {
     private Context mContext; //Activity context.
     private int mResource; //Represents the list_rowl file (our rows) as an int e.g. R.layout.list_row
-    private List<File> mObjects; //The List of objects we got from our model.
+    private List<Download> mObjects; //The List of objects we got from our model.
 
-    public FileArrayAdapter(Context c, int res, List<File> o) {
+    public DownloadArrayAdapter(Context c, int res, List<Download> o) {
         super(c, res, o);
         mContext = c;
         mResource = res;
         mObjects = o;
     }
 
-    public FileArrayAdapter(Context c, int res) {
+    public DownloadArrayAdapter(Context c, int res) {
         super(c, res);
         mContext = c;
         mResource = res;
+        mObjects = new ArrayList<Download>();
+    }
+
+    @Override
+    public int getCount(){
+        return mObjects.size();
     }
 
     /*
         Pulls out a specific File Object at a specified index.
-        FileArrayAdapter contains a list of Files it gets from our model's getAllFiles()
+        DownloadArrayAdapter contains a list of Files it gets from our model's getAllFiles()
     */
     @Override
-    public File getItem(int i) {
+    public Download getItem(int i) {
         return mObjects.get(i);
     }
 
@@ -60,7 +71,8 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
 
         TextView detailsView = (TextView) v.findViewById(R.id.details_text_view);
 
-        File file = getItem(position);
+        Download d = getItem(position);
+        File file = d.getFile();
 
         /* If the file is a dir, set the image view's image to a folder, else, a file. */
         if (file.isDirectory()) {
@@ -72,6 +84,13 @@ public class FileArrayAdapter extends ArrayAdapter<File> {
                 detailsView.setText(String.valueOf(file.length()));
             }
         }
+
+        //Set the progress Status
+        TextView progressBarText = (TextView) v.findViewById(R.id.download_progressbar_label);
+        progressBarText.setText(Integer.toString(d.getProgress()));
+
+        ProgressBar progressBar = (ProgressBar)v.findViewById(R.id.send_progress_bar);
+        progressBar.setProgress(d.getProgress());
 
         //Finally, set the name of the file or directory.
         nameView.setText(file.getName());

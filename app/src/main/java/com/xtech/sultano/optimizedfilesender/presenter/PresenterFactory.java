@@ -1,23 +1,47 @@
 package com.xtech.sultano.optimizedfilesender.presenter;
 
 import android.content.Context;
+import android.support.v4.app.LoaderManager;
+import android.util.Log;
 
+import com.xtech.sultano.optimizedfilesender.model.Model.Download;
+import com.xtech.sultano.optimizedfilesender.model.Model.DownloadModel;
 import com.xtech.sultano.optimizedfilesender.model.Model.Model;
+import com.xtech.sultano.optimizedfilesender.view.DownloadView;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
 
-public class PresenterFactory<T extends Presenter> {
+public class PresenterFactory<T extends PresenterFileManager> {
     private Model mModel;
-    private Presenter mPresenter;
+    private FileSenderManager mFileSenderManager;
+    private DownloadModel mDownloadModel;
+    private UiView mUiView;
+    private DownloadView mDownloadView;
+    private PresenterFileManager mPresenterFileManager;
+    private PresenterDownloadManager mPresenterDownloadManager;
+    private Context mContext;
+    private LoaderManager mLoaderManager;
+
+    public PresenterFactory(UiView uiView, DownloadView downloadView, Context context, LoaderManager mLoaderManager){
+        mUiView = uiView;
+        mContext = context;
+        mDownloadView = downloadView;
+        mModel = new Model();
+        mLoaderManager = mLoaderManager;
+        mDownloadModel = new DownloadModel();
+        Log.d("TEST:", mContext.toString());
+        mPresenterDownloadManager = new PresenterDownloadManager(downloadView, mDownloadModel, mContext, mLoaderManager);
+        mPresenterFileManager = new PresenterFileManager(mUiView, mModel, mContext, mLoaderManager);
+        mFileSenderManager = new FileSenderManager(mPresenterDownloadManager, mPresenterFileManager);
+        mPresenterFileManager.setFileSenderManager(mFileSenderManager);
+    }
 
     // Singleton design pattern
-    public Presenter create(Presenter presenter, UiView uiView, Context context) {
-        if(presenter == null){
-            mModel = new Model();
-            return new Presenter(uiView, mModel, context);
-        }
-        else{
-            mPresenter = presenter;
-            return presenter;
-        }
+    public PresenterFileManager getPresenterFileManager(UiView uiView, Context context) {
+        return this.mPresenterFileManager;
     }
+
+    public PresenterDownloadManager getPresenterDownloadManager(DownloadView downloadView, Context context) {
+        return this.mPresenterDownloadManager;
+    }
+
 }

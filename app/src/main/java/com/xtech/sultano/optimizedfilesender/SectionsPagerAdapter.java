@@ -37,6 +37,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return this.mPageList.get(0);
             case 1:
                 return this.mPageList.get(1);
+//                return this.mPageList.get(1);
             default:
                 return null;
         }

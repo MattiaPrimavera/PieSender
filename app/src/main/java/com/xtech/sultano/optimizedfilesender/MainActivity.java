@@ -3,6 +3,7 @@ package com.xtech.sultano.optimizedfilesender;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -12,15 +13,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.xtech.sultano.optimizedfilesender.presenter.PresenterFactory;
+import com.xtech.sultano.optimizedfilesender.view.DownloadView;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+    private LoaderManager mLoaderManager;
     private UiView mView;
+    private DownloadView mDownloadView;
     private ViewPager mViewPager;
     private TabLayout tabLayout;
     private ActionBar actionBar;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private DrawerLayout mDrawer;
+    private PresenterFactory mPresenterFactory;
     private ActionBarDrawerToggle mDrawerToggle;
 
     private void setupmViewPager() {
@@ -30,10 +37,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
-        mView = new UiView();
+        mView = UiView.newInstance();
+        mDownloadView = DownloadView.newInstance();
+        mLoaderManager = getSupportLoaderManager();
+        mPresenterFactory = new PresenterFactory(mView, mDownloadView, this, mLoaderManager);
+        mView.setPresenterFactory(mPresenterFactory);
+        mDownloadView.setPresenterFactory(mPresenterFactory);
 
         mSectionsPagerAdapter.addPage(mView, "ONE");
-        mSectionsPagerAdapter.addPage(new SectionsPagerAdapter.PlaceholderFragment(), "TWO");
+        mSectionsPagerAdapter.addPage(mDownloadView, "TWO");
         mViewPager.setAdapter(mSectionsPagerAdapter);
     }
 

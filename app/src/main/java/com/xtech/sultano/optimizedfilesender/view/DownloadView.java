@@ -12,16 +12,16 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.xtech.sultano.optimizedfilesender.R;
-import com.xtech.sultano.optimizedfilesender.presenter.PresenterFileManager;
+import com.xtech.sultano.optimizedfilesender.presenter.PresenterDownloadManager;
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterFactory;
 
-public class UiView extends ListFragment {
-    //This is a passive view, so my presenterFileManager handles all of the updating, etc.
-    private PresenterFileManager presenterFileManager;
+public class DownloadView extends ListFragment {
+    //This is a passive view, so my mPresenterDownloadManager handles all of the updating, etc.
+    private PresenterDownloadManager mPresenterDownloadManager;
     private PresenterFactory mPresenterFactory;
 
-    public void setPresenterFileManager(PresenterFileManager p) {
-        presenterFileManager = p;
+    public void setPresenterDownloadManager(PresenterDownloadManager p) {
+        mPresenterDownloadManager = p;
 
         /*I am not using this, but I like to enable it just in case I want to populate the overflow menu
         with menu options
@@ -29,7 +29,7 @@ public class UiView extends ListFragment {
         setHasOptionsMenu(true);
     }
 
-    public PresenterFileManager getPresenterFileManager(){ return this.presenterFileManager; }
+    public PresenterDownloadManager getmPresenterDownloadManager(){ return this.mPresenterDownloadManager; }
 
     public void setPresenterFactory(PresenterFactory presenterFactory){ this.mPresenterFactory = presenterFactory; }
 
@@ -37,8 +37,8 @@ public class UiView extends ListFragment {
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static UiView newInstance() {
-        UiView fragment = new UiView();
+    public static DownloadView newInstance() {
+        DownloadView fragment = new DownloadView();
         return fragment;
     }
 
@@ -52,27 +52,26 @@ public class UiView extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        setPresenterFileManager(mPresenterFactory.getPresenterFileManager(this, getActivity()));
+        setPresenterDownloadManager(mPresenterFactory.getPresenterDownloadManager(this, getContext()));
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
             public boolean onItemLongClick(AdapterView<?> adapter, View v, int position, long id) {
-                presenterFileManager.longListItemClicked(adapter, v, position, id);
+                mPresenterDownloadManager.longListItemClicked(adapter, v, position, id);
                 return true;
             }
         });
     }
 
     public void onBackPressed(){
-        presenterFileManager.homePressed();
+        mPresenterDownloadManager.homePressed();
     }
 
-    //When we intercept a click, call through to the appropriate method in the presenterFileManager.
+    //When we intercept a click, call through to the appropriate method in the mPresenterDownloadManager.
     @Override
     public void onListItemClick(ListView listView, android.view.View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
-        presenterFileManager.listItemClicked(listView, view, position, id);
+        mPresenterDownloadManager.listItemClicked(listView, view, position, id);
     }
 
 
@@ -94,10 +93,10 @@ public class UiView extends ListFragment {
 
         switch(id) {
             case android.R.id.home:
-                presenterFileManager.homePressed();
+                mPresenterDownloadManager.homePressed();
                 break;
 /*            case R.id.settings:
-                presenterFileManager.settings();*/
+                mPresenterDownloadManager.settings();*/
         }
 
         return super.onOptionsItemSelected(item);
@@ -116,6 +115,6 @@ public class UiView extends ListFragment {
     @Override
     public void onResume(){
         super.onResume();
-        presenterFileManager.onResume();
+        mPresenterDownloadManager.onResume();
     }
 }
