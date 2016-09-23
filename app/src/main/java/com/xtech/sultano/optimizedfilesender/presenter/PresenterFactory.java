@@ -26,21 +26,21 @@ public class PresenterFactory<T extends PresenterFileManager> {
         mContext = context;
         mDownloadView = downloadView;
         mModel = new Model();
-        mLoaderManager = mLoaderManager;
+        this.mLoaderManager = mLoaderManager;
         mDownloadModel = new DownloadModel();
         Log.d("TEST:", mContext.toString());
         mPresenterDownloadManager = new PresenterDownloadManager(downloadView, mDownloadModel, mContext, mLoaderManager);
-        mPresenterFileManager = new PresenterFileManager(mUiView, mModel, mContext, mLoaderManager);
+        mPresenterFileManager = new PresenterFileManager(mUiView, mModel, mContext, this.mLoaderManager);
         mFileSenderManager = new FileSenderManager(mPresenterDownloadManager, mPresenterFileManager);
         mPresenterFileManager.setFileSenderManager(mFileSenderManager);
     }
 
     // Singleton design pattern
-    public PresenterFileManager getPresenterFileManager(UiView uiView, Context context) {
+    public PresenterFileManager getPresenterFileManager() {
         return this.mPresenterFileManager;
     }
 
-    public PresenterDownloadManager getPresenterDownloadManager(DownloadView downloadView, Context context) {
+    public PresenterDownloadManager getPresenterDownloadManager() {
         return this.mPresenterDownloadManager;
     }
 

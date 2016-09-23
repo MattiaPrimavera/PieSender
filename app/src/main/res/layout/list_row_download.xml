@@ -68,11 +68,12 @@
                 android:textColor="@android:color/white"
                 android:textSize="10sp"/>
             <ProgressBar
-                android:layout_height="15dp"
+                android:layout_height="1dp"
                 android:layout_width="match_parent"
                 style="@android:style/Widget.ProgressBar.Horizontal"
                 android:visibility="visible"
                 android:max="100"
+                android:background="@android:color/holo_blue_bright"
                 android:id="@+id/send_progress_bar"/>
         </LinearLayout>
         <LinearLayout

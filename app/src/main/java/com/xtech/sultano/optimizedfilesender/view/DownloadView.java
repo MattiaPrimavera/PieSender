@@ -52,7 +52,7 @@ public class DownloadView extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setPresenterDownloadManager(mPresenterFactory.getPresenterDownloadManager(this, getContext()));
+        setPresenterDownloadManager(mPresenterFactory.getPresenterDownloadManager());
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override

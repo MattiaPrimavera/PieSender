@@ -16,7 +16,7 @@ public class FileSenderManager {
         this.mPresenterFileManager = presenterFileManager;
     }
 
-    public void createSendFileThread(View rowView, Handler mHandler, File fileClicked){
-        new Thread(new FileSenderRunnable(mPresenterFileManager, mPresenterDownloadManager, rowView, mHandler, fileClicked.getPath())).start();
+    public void createSendFileThread(View rowView, Handler mHandler, String filePath){
+        new Thread(new FileSenderRunnable(mPresenterFileManager, mPresenterDownloadManager, rowView, mHandler, filePath)).start();
     }
 }

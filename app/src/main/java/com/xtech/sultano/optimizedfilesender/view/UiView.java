@@ -53,7 +53,7 @@ public class UiView extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setPresenterFileManager(mPresenterFactory.getPresenterFileManager(this, getActivity()));
+        setPresenterFileManager(mPresenterFactory.getPresenterFileManager());
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override

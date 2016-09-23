@@ -108,11 +108,11 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
             }
         } else { //Otherwise, we have clicked a file, so attempt to open it.
             this.replaceIconWithCircularProgressBar(rowView);
-            this.createSendFileThread(rowView, fileClicked);
+            this.createSendFileThread(rowView, fileClicked.getPath());
         }
     }
 
-    public void createSendFileThread(View rowView, File fileClicked){
+    public void createSendFileThread(View rowView, String filePath){
         // Check if network is available
         boolean connected = false;
         ConnectivityManager connectivityManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -120,7 +120,8 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
             // We're connected
             Handler mHandler = new Handler();
-            mFileSenderManager.createSendFileThread(rowView, mHandler, fileClicked);
+            Log.d("TEST2:", "longListItemClicked" + filePath);
+            mFileSenderManager.createSendFileThread(rowView, mHandler, filePath);
         }
         else { // Make a toast to warn the user!
             this.makeToast("No Network connections available :(");
@@ -130,10 +131,11 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
     public boolean longListItemClicked(AdapterView<?> adapter, View rowView, int position, long id) {
         //The file we clicked based on row position where we clicked.  I could probably word that better. :)
         File fileClicked = mFileArrayAdapter.getItem(position);
+        Log.d("TEST2:", "longListItemClicked" + fileClicked.getPath());
 
         if (fileClicked.isDirectory()) {
             this.replaceIconWithCircularProgressBar(rowView);
-            this.createSendFileThread(rowView, fileClicked);
+            this.createSendFileThread(rowView, fileClicked.getPath());
         }
         return false;
     }

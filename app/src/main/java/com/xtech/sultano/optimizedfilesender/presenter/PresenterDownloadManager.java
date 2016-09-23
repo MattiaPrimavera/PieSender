@@ -89,9 +89,8 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         }
     }
 
-    public void updateModel(File file, int progressStatus){
-        Log.d("TEST:", "updatingModel DownloadView, progressStatus: " + Integer.toString(progressStatus) + ", " + file.getName() + " ; " + file.getPath());
-        mModel.updateProgress(file, progressStatus);
+    public void updateModel(String filePath, int progressStatus){
+        mModel.updateProgress(filePath, progressStatus);
         if(mView.isAdded()) {
             Log.d("TEST:", "updatingModel --> restarting Loader and updating progress bar");
             mLoaderManager.restartLoader(LOADER_ID, null, this);
@@ -125,30 +124,19 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
             try {
                 Log.d("TEST:", "updating View n^" + Integer.toString(i));
                 v = rootView.getChildAt(i);
+                int percentage = mModel.getDownload(i).getProgress();
+                ProgressBar progressBar = (ProgressBar)v.findViewById(R.id.send_progress_bar);
+                Log.d("TEST:", "percentage set: "+ Integer.toString(percentage));
+                progressBar.setProgress(percentage);
+
+                TextView progressBarText = (TextView) v.findViewById(R.id.download_progressbar_label);
+                progressBarText.setText(Integer.toString(percentage) + "%");
             }catch(Exception e){
                 Log.d("TEST:", "updating lastView is " + Integer.toString(i-1));
                 e.printStackTrace();
                 continue;
             }
 
-            int percentage = mModel.getDownload(i).getProgress();
-            float value = (float) (percentage / 100.0);
-            View bar1 = v.findViewById(R.id.myRectangleView);
-            View bar2 = v.findViewById(R.id.myRectangleView2);
-            bar1.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1 - value));
-            bar2.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, value));
-
-            //Update circular progress bar
-//            ProgressBar circular = (ProgressBar) v.findViewById(R.id.circular_progressbar);
-//            int percentageInt = (int)percentage;
-//            circular.setProgress(percentageInt);
-
-            ProgressBar progressBar = (ProgressBar)v.findViewById(R.id.send_progress_bar);
-            Log.d("TEST:", "percentage set: "+ Integer.toString(percentage));
-            progressBar.setProgress(percentage);
-
-            TextView progressBarText = (TextView) v.findViewById(R.id.download_progressbar_label);
-            progressBarText.setText(Integer.toString(percentage) + "%");
         }
         rootView.requestLayout();
     }

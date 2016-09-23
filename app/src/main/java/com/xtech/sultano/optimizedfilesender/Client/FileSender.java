@@ -69,7 +69,7 @@ public class FileSender {
                 // Updating progress bar
                 if(updateView) {
                     int percentage = (int) ((total * 100) / file.length());
-                    new Thread(new ProgressUpdaterRunnable(file, this.rowView, mHandler, percentage)).start();
+                    new Thread(new ProgressUpdaterRunnable(filePath, this.rowView, mHandler, percentage)).start();
                 }
             }
             Log.d("TEST:", "total: " + Long.toString(total) );
@@ -132,7 +132,7 @@ public class FileSender {
                     os.write(b, 0, numRead);
 
                     int percentage = (int)((total * 100) / file.length());
-                    new Thread(new ProgressUpdaterRunnable(file, this.rowView, mHandler, percentage)).start();
+                    new Thread(new ProgressUpdaterRunnable(file.getPath(), this.rowView, mHandler, percentage)).start();
                 }
                 Log.d("TEST:", "total: " + Long.toString(total) );
                 os.flush();
@@ -169,7 +169,7 @@ public class FileSender {
             for (int cur_file=0; cur_file<cnt_files; cur_file++) {
                 File file = allFiles.get(cur_file);
                 long total = this.sendFile(file.getPath(), false, true);
-                sleep(2000);
+                sleep(10);
                 Log.d("TEST: --> total: ", Long.toString(total));
                 //Log.d("TEST: file length: ", Long.toString(file.length()));
                 //Log.d("TEST: file name: ", file.getName() );
@@ -177,7 +177,7 @@ public class FileSender {
                 totalSent += total;
                 int percentage = (int)((totalSent * 100) / totalSize);
 
-                new Thread(new ProgressUpdaterRunnable(file, this.rowView, mHandler, percentage)).start();
+                new Thread(new ProgressUpdaterRunnable(directoryPath, this.rowView, mHandler, percentage)).start();
             }
         }
         catch (Exception ex) {
@@ -215,13 +215,13 @@ public class FileSender {
         private int mProgressStatus;
         private View v;
         private Handler mHandler;
-        private File file;
+        private String mFilePath;
 
-        public ProgressUpdaterRunnable(File file, View v, Handler mHandler, int mProgressStatus){
+        public ProgressUpdaterRunnable(String filePath, View v, Handler mHandler, int mProgressStatus){
             this.v = v;
             this.mHandler = mHandler;
             this.mProgressStatus = mProgressStatus;
-            this.file = file;
+            this.mFilePath = filePath;
         }
 
         public void run(){
@@ -229,7 +229,7 @@ public class FileSender {
             mHandler.post(new Runnable() {
                 public void run() {
                     mPresenterFileManager.updateProgressBar(v, mProgressStatus);
-                    mPresenterDownloadManager.updateModel(file, mProgressStatus);
+                    mPresenterDownloadManager.updateModel(mFilePath, mProgressStatus);
                     mPresenterDownloadManager.updateProgressBar();
                 }
             });

@@ -1,6 +1,7 @@
 package com.xtech.sultano.optimizedfilesender.Client;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterDownloadManager;
@@ -34,7 +35,7 @@ public class FileSenderRunnable implements Runnable{
                 fileSender.sendDirectory(filePath);
             }else{
                 fileSender = new FileSender(8000, "localhost", mPresenterFileManager, mPresenterDownloadManager, rowView, mHandler);
-                fileSender.sendFile(filePath, true, false);
+                fileSender.sendFile(this.filePath, true, false);
             }
         }catch(Exception e){
             e.printStackTrace();
