@@ -39,8 +39,38 @@
             android:layout_width="30dp"
             android:layout_height="30dp">
 
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:id="@+id/circular_progressbar_layout"
+                android:visibility="gone"
+                android:layout_width="30dp"
+                android:layout_height="30dp">
+
+                <ProgressBar
+                    android:id="@+id/circular_progressbar"
+                    style="?android:attr/progressBarStyleInverse"
+                    android:layout_marginRight="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="false"
+                    android:background="@drawable/progress"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/circular_progressbar_label"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:gravity="center"
+                    android:layout_centerInParent="true"
+                    android:textColor="@android:color/white"
+                    android:textSize="5sp" />
+            </LinearLayout>
+
             <ImageView
-                    android:id="@+id/imageView"
+                    android:id="@+id/iconImageView"
                     android:orientation="vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -49,7 +79,7 @@
         </LinearLayout>
         <LinearLayout
             android:orientation="vertical"
-            android:layout_marginLeft="10dip"
+            android:layout_marginLeft="10dp"
             android:layout_toRightOf="@id/icon_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -64,7 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/name_text_view"
-                android:layout_toRightOf="@id/imageView"
+                android:layout_toRightOf="@id/iconImageView"
                 android:textColor="@android:color/white"
                 android:textSize="10sp"/>
             <ProgressBar
