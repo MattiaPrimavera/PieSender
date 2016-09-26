@@ -143,6 +143,7 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
     public void sendAll(){
         ListView listView = mView.getListView();
         int nb_child = listView.getChildCount();
+        Log.d("TEST6;", "number of File rows: " + Integer.toString(nb_child));
         for(int i = 0; i < nb_child; i++){
             View rowView = listView.getChildAt(i);
             String fileName = (String) ((TextView)rowView.findViewById(R.id.name_text_view)).getText();

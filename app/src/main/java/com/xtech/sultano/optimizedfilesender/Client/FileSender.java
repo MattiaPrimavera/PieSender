@@ -166,13 +166,10 @@ public class FileSender {
 
             long totalSent = 0;
 
+            // Looping through all files contained and sending them
             for (int cur_file=0; cur_file<cnt_files; cur_file++) {
                 File file = allFiles.get(cur_file);
                 long total = this.sendFile(file.getPath(), false, true);
-                sleep(10);
-                Log.d("TEST: --> total: ", Long.toString(total));
-                //Log.d("TEST: file length: ", Long.toString(file.length()));
-                //Log.d("TEST: file name: ", file.getName() );
 
                 totalSent += total;
                 int percentage = (int)((totalSent * 100) / totalSize);
