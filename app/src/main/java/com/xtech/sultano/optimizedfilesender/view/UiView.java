@@ -96,6 +96,9 @@ public class UiView extends ListFragment {
             case android.R.id.home:
                 presenterFileManager.homePressed();
                 break;
+            case R.id.action_send_all_files:
+                presenterFileManager.sendAll();
+                break;
 /*            case R.id.settings:
                 presenterFileManager.settings();*/
         }

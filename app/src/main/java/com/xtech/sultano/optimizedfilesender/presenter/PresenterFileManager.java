@@ -140,6 +140,17 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         return false;
     }
 
+    public void sendAll(){
+        ListView listView = mView.getListView();
+        int nb_child = listView.getChildCount();
+        for(int i = 0; i < nb_child; i++){
+            View rowView = listView.getChildAt(i);
+            String fileName = (String) ((TextView)rowView.findViewById(R.id.name_text_view)).getText();
+            Log.d("TEST5: ", fileName);
+            this.createSendFileThread(rowView, mModel.getmCurrentDir().getPath() + "/" + fileName);
+        }
+    }
+
     public void updateProgressBar(View v, float percentage){
         float value = (float) (percentage / 100.0);
         View bar1 = v.findViewById(R.id.myRectangleView);
