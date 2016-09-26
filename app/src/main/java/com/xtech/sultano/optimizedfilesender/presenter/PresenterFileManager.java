@@ -108,11 +108,11 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
             }
         } else { //Otherwise, we have clicked a file, so attempt to open it.
             this.replaceIconWithCircularProgressBar(rowView);
-            this.createSendFileThread(rowView, fileClicked.getPath());
+            this.createSendFileThread(rowView, fileClicked.getPath(), true);
         }
     }
 
-    public void createSendFileThread(View rowView, String filePath){
+    public void createSendFileThread(View rowView, String filePath, boolean updateFileView){
         // Check if network is available
         boolean connected = false;
         ConnectivityManager connectivityManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -121,7 +121,7 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
             // We're connected
             Handler mHandler = new Handler();
             Log.d("TEST2:", "longListItemClicked" + filePath);
-            mFileSenderManager.createSendFileThread(rowView, mHandler, filePath);
+            mFileSenderManager.createSendFileThread(rowView, mHandler, filePath, updateFileView);
         }
         else { // Make a toast to warn the user!
             this.makeToast("No Network connections available :(");
@@ -135,21 +135,14 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
         if (fileClicked.isDirectory()) {
             this.replaceIconWithCircularProgressBar(rowView);
-            this.createSendFileThread(rowView, fileClicked.getPath());
+            this.createSendFileThread(rowView, fileClicked.getPath(), true);
         }
         return false;
     }
 
     public void sendAll(){
-        ListView listView = mView.getListView();
-        int nb_child = listView.getChildCount();
-        Log.d("TEST6;", "number of File rows: " + Integer.toString(nb_child));
-        for(int i = 0; i < nb_child; i++){
-            View rowView = listView.getChildAt(i);
-            String fileName = (String) ((TextView)rowView.findViewById(R.id.name_text_view)).getText();
-            Log.d("TEST5: ", fileName);
-            this.createSendFileThread(rowView, mModel.getmCurrentDir().getPath() + "/" + fileName);
-        }
+        File currentDir = mModel.getmCurrentDir();
+        this.createSendFileThread(null, currentDir.getPath(), false);
     }
 
     public void updateProgressBar(View v, float percentage){

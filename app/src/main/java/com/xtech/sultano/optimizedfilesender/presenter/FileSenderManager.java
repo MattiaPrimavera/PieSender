@@ -18,8 +18,8 @@ public class FileSenderManager implements Observer, Runnable{
         this.mThreadQueue = new ThreadQueue();
     }
 
-    public void createSendFileThread(View rowView, Handler mHandler, String filePath){
-        FileSenderRunnable fileSenderRunnable = new FileSenderRunnable(mPresenterFileManager, mPresenterDownloadManager, rowView, mHandler, filePath);
+    public void createSendFileThread(View rowView, Handler mHandler, String filePath, boolean updateFileView){
+        FileSenderRunnable fileSenderRunnable = new FileSenderRunnable(mPresenterFileManager, mPresenterDownloadManager, rowView, mHandler, filePath, updateFileView);
         fileSenderRunnable.register(this);
         this.mThreadQueue.enqueue(new Thread(fileSenderRunnable));
     }

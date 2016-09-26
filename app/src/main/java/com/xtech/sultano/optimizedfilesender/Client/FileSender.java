@@ -28,9 +28,11 @@ public class FileSender {
     private PresenterFileManager mPresenterFileManager;
     private PresenterDownloadManager mPresenterDownloadManager;
     private Handler mHandler;
+    private boolean mUpdateFileView;
 
-    public FileSender(int port, String host, PresenterFileManager mPresenterFileManager, PresenterDownloadManager mPresenterDownloadManager, View rowView, Handler mHandler){
+    public FileSender(int port, String host, PresenterFileManager mPresenterFileManager, PresenterDownloadManager mPresenterDownloadManager, View rowView, Handler mHandler, boolean updateFileView){
         this.port = 8000;
+        this.mUpdateFileView = updateFileView;
         this.host = "192.168.0.13";
         this.rowView = rowView;
         this.mPresenterFileManager = mPresenterFileManager;
@@ -69,7 +71,7 @@ public class FileSender {
                 // Updating progress bar
                 if(updateView) {
                     int percentage = (int) ((total * 100) / file.length());
-                    new Thread(new ProgressUpdaterRunnable(filePath, this.rowView, mHandler, percentage)).start();
+                    new Thread(new ProgressUpdaterRunnable(filePath, this.rowView, mHandler, percentage, mUpdateFileView)).start();
                 }
             }
             Log.d("TEST:", "total: " + Long.toString(total) );
@@ -132,7 +134,7 @@ public class FileSender {
                     os.write(b, 0, numRead);
 
                     int percentage = (int)((total * 100) / file.length());
-                    new Thread(new ProgressUpdaterRunnable(file.getPath(), this.rowView, mHandler, percentage)).start();
+                    new Thread(new ProgressUpdaterRunnable(file.getPath(), this.rowView, mHandler, percentage, mUpdateFileView)).start();
                 }
                 Log.d("TEST:", "total: " + Long.toString(total) );
                 os.flush();
@@ -174,7 +176,7 @@ public class FileSender {
                 totalSent += total;
                 int percentage = (int)((totalSent * 100) / totalSize);
 
-                new Thread(new ProgressUpdaterRunnable(directoryPath, this.rowView, mHandler, percentage)).start();
+                new Thread(new ProgressUpdaterRunnable(directoryPath, this.rowView, mHandler, percentage, mUpdateFileView)).start();
             }
         }
         catch (Exception ex) {
@@ -213,9 +215,11 @@ public class FileSender {
         private View v;
         private Handler mHandler;
         private String mFilePath;
+        private boolean mUpdateFileView;
 
-        public ProgressUpdaterRunnable(String filePath, View v, Handler mHandler, int mProgressStatus){
+        public ProgressUpdaterRunnable(String filePath, View v, Handler mHandler, int mProgressStatus, boolean updateFileView){
             this.v = v;
+            this.mUpdateFileView = updateFileView;
             this.mHandler = mHandler;
             this.mProgressStatus = mProgressStatus;
             this.mFilePath = filePath;
@@ -225,7 +229,9 @@ public class FileSender {
             // Update the progress bar
             mHandler.post(new Runnable() {
                 public void run() {
-                    mPresenterFileManager.updateProgressBar(v, mProgressStatus);
+                    if(mUpdateFileView){
+                        mPresenterFileManager.updateProgressBar(v, mProgressStatus);
+                    }
                     mPresenterDownloadManager.updateModel(mFilePath, mProgressStatus);
                     mPresenterDownloadManager.updateProgressBar();
                 }

@@ -19,8 +19,10 @@ public class FileSenderRunnable implements Runnable, Subject {
     private View rowView;
     private FileSender fileSender;
     private ArrayList<Observer> mObserverList;
+    private boolean mUpdateFileView;
 
-    public FileSenderRunnable(PresenterFileManager mPresenterFileManager, PresenterDownloadManager mPresenterDownloadManager, View rowView, Handler mHandler, String filePath){
+    public FileSenderRunnable(PresenterFileManager mPresenterFileManager, PresenterDownloadManager mPresenterDownloadManager, View rowView, Handler mHandler, String filePath, boolean updateFileView){
+        this.mUpdateFileView = updateFileView;
         this.filePath = filePath;
         this.mHandler = mHandler;
         this.rowView = rowView;
@@ -34,11 +36,11 @@ public class FileSenderRunnable implements Runnable, Subject {
             File fileToSend = new File(this.filePath);
             mPresenterDownloadManager.addDownload(fileToSend);
             if(fileToSend.isDirectory()){
-                fileSender = new FileSender(8000, "localhost", mPresenterFileManager, mPresenterDownloadManager, rowView, mHandler);
+                fileSender = new FileSender(8000, "localhost", mPresenterFileManager, mPresenterDownloadManager, rowView, mHandler, mUpdateFileView);
                 fileSender.sendDirectory(filePath);
                 this.notifyObservers();
             }else{
-                fileSender = new FileSender(8000, "localhost", mPresenterFileManager, mPresenterDownloadManager, rowView, mHandler);
+                fileSender = new FileSender(8000, "localhost", mPresenterFileManager, mPresenterDownloadManager, rowView, mHandler, mUpdateFileView);
                 fileSender.sendFile(this.filePath, true, false);
                 this.notifyObservers();
             }
