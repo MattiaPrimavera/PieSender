@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mView.setPresenterFactory(mPresenterFactory);
         mDownloadView.setPresenterFactory(mPresenterFactory);
 
+        // Graphical interface is composed by two views, accessible through a tabbed layout
         mSectionsPagerAdapter.addPage(mView, "ONE");
         mSectionsPagerAdapter.addPage(mDownloadView, "TWO");
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Setting up Toolbar + NavigationBar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.bringToFront();
