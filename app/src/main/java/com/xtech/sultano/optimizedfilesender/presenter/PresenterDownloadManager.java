@@ -86,20 +86,20 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         //}
     }
 
-    public void updateModel(String filePath, int progressStatus){
+    public synchronized void updateModel(String filePath, int progressStatus){
         mModel.updateProgress(filePath, progressStatus);
         //Log.d("LOGM", "updating Model --> PRESENTER DOWNLOAD MANAGER == " + Integer.toString(progressStatus));
 
-        if(mView.isAdded()) {
+//        if(mView.isAdded()) {
             this.updateProgressBar();
 //            mLoaderManager.getLoader(LOADER_ID).onContentChanged();
 //            mLoaderManager.restartLoader(LOADER_ID, null, this);
             //this.updateProgressBar();
-        }
+//        }
     }
 
     /*Called to update the Adapter with a new list of files when mCurrentDir changes.*/
-    private void updateAdapter(List<Download> data) {
+    private synchronized void updateAdapter(List<Download> data) {
         Log.d("LOGDownloader", "UPDATING ADAPTER");
         //clear the old data.
         mDownloadArrayAdapter.clear();
