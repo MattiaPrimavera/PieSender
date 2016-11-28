@@ -12,20 +12,14 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class FileSenderRunnable implements Runnable, Subject {
-    private Handler mHandler;
     private String filePath;
     private PresenterFileManager mPresenterFileManager;
     private PresenterDownloadManager mPresenterDownloadManager;
-    private View rowView;
     private FileSender fileSender;
     private ArrayList<Observer> mObserverList;
-    private boolean mUpdateFileView;
 
-    public FileSenderRunnable(PresenterFileManager mPresenterFileManager, PresenterDownloadManager mPresenterDownloadManager, View rowView, Handler mHandler, String filePath, boolean updateFileView){
-        this.mUpdateFileView = updateFileView;
+    public FileSenderRunnable(PresenterFileManager mPresenterFileManager, PresenterDownloadManager mPresenterDownloadManager, String filePath){
         this.filePath = filePath;
-        this.mHandler = mHandler;
-        this.rowView = rowView;
         this.mPresenterFileManager = mPresenterFileManager;
         this.mPresenterDownloadManager = mPresenterDownloadManager;
     }
@@ -36,12 +30,12 @@ public class FileSenderRunnable implements Runnable, Subject {
             File fileToSend = new File(this.filePath);
             mPresenterDownloadManager.addDownload(fileToSend);
             if(fileToSend.isDirectory()){
-                fileSender = new FileSender(8000, "localhost", mPresenterFileManager, mPresenterDownloadManager, rowView, mHandler, mUpdateFileView);
+                fileSender = new FileSender(8000, "localhost", mPresenterFileManager, mPresenterDownloadManager);
                 fileSender.sendDirectory(filePath);
                 this.notifyObservers();
             }else{
-                fileSender = new FileSender(8000, "localhost", mPresenterFileManager, mPresenterDownloadManager, rowView, mHandler, mUpdateFileView);
-                fileSender.sendFile(this.filePath, true, false);
+                fileSender = new FileSender(8000, "localhost", mPresenterFileManager, mPresenterDownloadManager);
+                fileSender.sendFile(this.filePath, false);
                 this.notifyObservers();
             }
         }catch(Exception e){

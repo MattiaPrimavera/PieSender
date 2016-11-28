@@ -2,6 +2,7 @@ package com.xtech.sultano.optimizedfilesender.presenter;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
 
 import com.xtech.sultano.optimizedfilesender.model.Model.Download;
 import com.xtech.sultano.optimizedfilesender.model.Model.DownloadModel;
@@ -25,32 +26,40 @@ public class DownloadLoader extends AsyncTaskLoader<List<Download>> {
      */
     public DownloadLoader(Context context, DownloadModel mModel) {
         super(context);
+        Log.d("LOGDownloader", "constructor");
         this.mModel = mModel;
     }
 
     @Override
     public void onContentChanged(){
+        Log.d("LOGDownloader", "onContentChanged ...");
         this.forceLoad();
     }
 
     @Override
     public void onStartLoading() {
+        Log.d("LOGDownloader", "onStartLoading");
         super.onStartLoading();
+
         // If we already own an instance, simply deliver it.
         if (mData != null) {
+            Log.d("LOGDownloader", "onStartLoading mData is NOT null --> deliveringresult");
             deliverResult(mData);
         }else { // Otherwise, force a load
+            Log.d("LOGDownloader", "onStartLoading mData is Null! --> forceloadings");
             forceLoad();
         }
     }
 
     @Override
     public List<Download> loadInBackground() {
+        Log.d("LOGDownloader", "loadInBackground");
         return mModel.getAllDownloads();
     }
 
     @Override
     protected void onReset() {
+        Log.d("LOGDownloader", "onReset");
         super.onReset();
 
         // Ensure the loader is stopped
@@ -70,27 +79,30 @@ public class DownloadLoader extends AsyncTaskLoader<List<Download>> {
      */
     @Override
     public void deliverResult(List<Download> downloads) {
+        Log.d("LOGDownloader", "deliverResult");
         if (isReset()) {
             // An async query came in while the loader is stopped.  We
             // don't need the result.
             if (downloads != null) {
                 onReleaseResources(downloads);
             }
-        }
-        List<Download> oldDownloads = mData;
-        mData = downloads;
+        }else{
+            List<Download> oldDownloads = mData;
+            mData = downloads;
 
-        if (isStarted()) {
-            // If the Loader is currently started, we can immediately
-            // deliver its results.
-            super.deliverResult(downloads);
-        }
+            if (isStarted()) {
+                Log.d("LOGDownloader", "deliverResult isStarted OK");
+                // If the Loader is currently started, we can immediately
+                // deliver its results.
+                super.deliverResult(mData);
+            }
 
-        // At this point we can release the resources associated with
-        // 'oldfiles' if needed; now that the new result is delivered we
-        // know that it is no longer in use.
-        if (oldDownloads != null) {
-            onReleaseResources(oldDownloads);
+            // At this point we can release the resources associated with
+            // 'oldfiles' if needed; now that the new result is delivered we
+            // know that it is no longer in use.
+            if (oldDownloads != null) {
+                onReleaseResources(oldDownloads);
+            }
         }
     }
 
@@ -99,6 +111,7 @@ public class DownloadLoader extends AsyncTaskLoader<List<Download>> {
      * Handles a request to stop the Loader.
      */
     @Override protected void onStopLoading() {
+        Log.d("LOGDownloader", "onStopLoading");
         super.onStopLoading();
         // Attempt to cancel the current load task if possible.
         cancelLoad();
@@ -108,6 +121,7 @@ public class DownloadLoader extends AsyncTaskLoader<List<Download>> {
      * Handles a request to cancel a load.
      */
     @Override public void onCanceled(List<Download> mData) {
+        Log.d("LOGDownloader", "onCanceled");
         super.onCanceled(mData);
 
         // At this point we can release the resources associated with 'apps'
@@ -116,6 +130,7 @@ public class DownloadLoader extends AsyncTaskLoader<List<Download>> {
     }
 
     protected void onReleaseResources(List<Download> apps) {
+        Log.d("LOGDownloader", "onReleaseresources");
         // For a simple List<> there is nothing to do.  For something
         // like a Cursor, we would close it here.
     }

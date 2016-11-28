@@ -28,11 +28,9 @@ public class DownloadModel {
     }
 
     public Download getDownloadByFilePath(String path){
-        Log.d("TEST3:", "getDownloadByFilePath --> " + path);
         for(int i = 0; i < this.mDownloadList.size(); i++){
             Download d = this.mDownloadList.get(i);
             String dpath = d.getFile().getPath();
-            Log.d("TEST3:", Integer.toString(i) + " : " + path + " == " + dpath);
             if(dpath == path){
                 return d;
             }
@@ -51,17 +49,13 @@ public class DownloadModel {
 
     public synchronized boolean updateProgress(String filePath, int percentage){
         boolean updated = false;
-        Log.d("TEST2:", "updateProgress");
-        for(int i=0; i < this.mDownloadList.size(); i++){
+/*        for(int i=0; i < this.mDownloadList.size(); i++){
             Log.d("TEST2:", Integer.toString(i) + " --> " + this.mDownloadList.get(i).getFile().getPath());
-        }
+        }*/
         Download d = this.getDownloadByFilePath(filePath);
         if(d != null){
-            Log.d("TEST2:", "Found!!!");
             d.setProgress(percentage);
             updated = true;
-        }else{
-            Log.d("TEST2:", "Not Found!!");
         }
         return updated;
     }

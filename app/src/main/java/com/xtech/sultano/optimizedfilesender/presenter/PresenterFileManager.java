@@ -108,20 +108,18 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
             }
         } else { //Otherwise, we have clicked a file, so attempt to open it.
             this.replaceIconWithCircularProgressBar(rowView);
-            this.createSendFileThread(rowView, fileClicked.getPath(), true);
+            this.createSendFileThread(fileClicked.getPath());
         }
     }
 
-    public void createSendFileThread(View rowView, String filePath, boolean updateFileView){
+    public void createSendFileThread(String filePath){
         // Check if network is available
         boolean connected = false;
         ConnectivityManager connectivityManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
             // We're connected
-            Handler mHandler = new Handler();
-            Log.d("TEST2:", "longListItemClicked" + filePath);
-            mFileSenderManager.createSendFileThread(rowView, mHandler, filePath, updateFileView);
+            mFileSenderManager.createSendFileThread(filePath);
         }
         else { // Make a toast to warn the user!
             this.makeToast("No Network connections available :(");
@@ -131,21 +129,20 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
     public boolean longListItemClicked(AdapterView<?> adapter, View rowView, int position, long id) {
         //The file we clicked based on row position where we clicked.  I could probably word that better. :)
         File fileClicked = mFileArrayAdapter.getItem(position);
-        Log.d("TEST2:", "longListItemClicked" + fileClicked.getPath());
 
         if (fileClicked.isDirectory()) {
             this.replaceIconWithCircularProgressBar(rowView);
-            this.createSendFileThread(rowView, fileClicked.getPath(), true);
+            this.createSendFileThread(fileClicked.getPath());
         }
         return false;
     }
 
     public void sendAll(){
         File currentDir = mModel.getmCurrentDir();
-        this.createSendFileThread(null, currentDir.getPath(), false);
+        this.createSendFileThread(currentDir.getPath());
     }
 
-    public void updateProgressBar(View v, float percentage){
+/*    public void updateProgressBar(View v, float percentage){
         float value = (float) (percentage / 100.0);
         View bar1 = v.findViewById(R.id.myRectangleView);
         View bar2 = v.findViewById(R.id.myRectangleView2);
@@ -160,9 +157,8 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         TextView progressBarText = (TextView) v.findViewById(R.id.circular_progressbar_label);
         progressBarText.setText(Float.toString(percentage) + "%");
     }
-
+*/
     public void replaceIconWithCircularProgressBar(View rowView){
-        Log.d("TEST:", "replaceIcon called");
         // Hiding File icon
         ImageView icon = (ImageView) rowView.findViewById(R.id.iconImageView);
         icon.setVisibility(View.GONE);
