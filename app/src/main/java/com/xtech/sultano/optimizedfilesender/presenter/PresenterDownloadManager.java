@@ -42,6 +42,7 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     private List<Download> mData; //The list of all downloads
     private final int LOADER_ID = 102;
     private Context mContext;
+    private Handler mHandler;
     private LoaderManager mLoaderManager;
     private DownloadLoader mDownloadLoader; /*Loads the list of files from the model in
     a background thread.*/
@@ -52,6 +53,7 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         this.mModel = mModel;
         this.mData = new ArrayList<Download>();
         this.mContext = context;
+        this.mHandler = new Handler();
         this.init();
     }
 
@@ -65,7 +67,7 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         //mDownloadLoader = new DownloadLoader(mView.getActivity());
     }
 
-    private void startLoader(){
+    private synchronized void startLoader(){
         /*
             Start the AsyncTaskLoader that will update the adapter for
             the ListView. We update the adapter in the onLoadFinished() callback.
@@ -78,33 +80,42 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         }
     }
 
-    public void addDownload(File f){
+    public synchronized void addDownload(File f){
         mModel.addDownload(new Download(f, f.length(), f.isDirectory(), 0));
-        //if(mView.isAdded()) {
-            //mLoaderManager.getLoader(LOADER_ID).onContentChanged();
-            mLoaderManager.restartLoader(LOADER_ID, null, this);
-        //}
+        if(mView.isAdded()) {
+            //mDownloadLoader.onContentChanged();
+//            mLoaderManager.restartLoader(LOADER_ID, null, this);
+            if(mDownloadLoader == null)
+                this.startLoader();
+            if (mDownloadLoader.isStarted()) {
+                mDownloadLoader.onContentChanged();
+            }
+        }
     }
 
     public synchronized void updateModel(String filePath, int progressStatus){
         mModel.updateProgress(filePath, progressStatus);
         //Log.d("LOGM", "updating Model --> PRESENTER DOWNLOAD MANAGER == " + Integer.toString(progressStatus));
 
-//        if(mView.isAdded()) {
-            this.updateProgressBar();
+        if(mView.isAdded()) {
+            mHandler.post(new Runnable() {
+                public void run() {
+                    updateAdapter(mModel.getAllDownloads());
+                }
+            });
+            // Update the progress bar
+
 //            mLoaderManager.getLoader(LOADER_ID).onContentChanged();
-//            mLoaderManager.restartLoader(LOADER_ID, null, this);
+            //mLoaderManager.restartLoader(LOADER_ID, null, this);
             //this.updateProgressBar();
-//        }
+        }
     }
 
     /*Called to update the Adapter with a new list of files when mCurrentDir changes.*/
-    private synchronized void updateAdapter(List<Download> data) {
+    public synchronized void updateAdapter(List<Download> data) {
         Log.d("LOGDownloader", "UPDATING ADAPTER");
         //clear the old data.
-        mDownloadArrayAdapter.clear();
-        //add the new data.
-        mDownloadArrayAdapter.addAll(data);
+        mDownloadArrayAdapter.setData(data);
         //inform the ListView to refrest itself with the new data.
         mDownloadArrayAdapter.notifyDataSetChanged();
     }
@@ -116,21 +127,22 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         return false;
     }
 
-    public void updateProgressBar(){
-        Log.d("TEST:", "DownloadView updateProgressBar method");
+    public synchronized void updateProgressBar(){
 
         ListView rootView = null;
         try {
+            if(mModel == null) return;
             for (int i = 0; i < mModel.getDownloadNumber(); i++) {
                 try {
+                    if(!mView.isAdded())
+                        return;
                     rootView = mView.getListView();
                     View v;
-                    Log.d("TEST:", "updating View n^" + Integer.toString(i));
                     v = rootView.getChildAt(i);
                     int percentage = mModel.getDownload(i).getProgress();
 
                     ProgressBar progressBar = (ProgressBar) v.findViewById(R.id.send_progress_bar);
-                    Log.d("TEST:", "percentage set: " + Integer.toString(percentage));
+                    Log.d("TEST:", "updating View n^" + Integer.toString(i) + "percentage set: " + Integer.toString(percentage));
                     if (progressBar != null)
                         progressBar.setProgress(percentage);
 
@@ -178,8 +190,8 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     //Called when the loader has finished acquiring its load.
     @Override
     public void onLoadFinished(Loader<List<Download>> loader, List<Download> data) {
-        Log.d("LOG", "LOAD FINISHED!!!!!! UPDATING ADAPTER");
         this.mData = data;
+        Log.d("LOG22", "LOAD FINISHED, Size: " + mData.size());
         /* My data source has changed so now the adapter needs to be reset to reflect the changes
         in the ListView.*/
         updateAdapter(data);
@@ -187,10 +199,11 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
 
     @Override
     public void onLoaderReset(Loader<List<Download>> loader) {
-        this.mDownloadArrayAdapter.clear();
+        this.updateAdapter(null);
     }
 
     public void onResume(){
+        Log.d("LOGDownloader", "onResume PresenterDownloadManager");
         this.startLoader();
     }
 }

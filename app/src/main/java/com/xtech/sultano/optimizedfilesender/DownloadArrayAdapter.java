@@ -113,4 +113,11 @@ public class DownloadArrayAdapter extends ArrayAdapter<Download> {
         }
         icon.setImageResource(id);
     }
+
+    public void setData(List<Download> data) {
+        clear();
+        if (data != null) {
+            addAll(data);
+        }
+    }
 }

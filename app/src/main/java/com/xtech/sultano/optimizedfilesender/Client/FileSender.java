@@ -67,8 +67,9 @@ public class FileSender {
                 os.write(b, 0, numRead);
 
                 int percentage = (int) ((total * 100) / file.length());
-//                Log.d("LOGM", "--> sendingFile, updating the model");
-                mPresenterDownloadManager.updateModel(filePath, percentage);
+                //Log.d("LOG-file-sending", "--> sendingFile, updating the model: " + Integer.toString(percentage));
+                if(percentage % 10 == 0)
+                    mPresenterDownloadManager.updateModel(filePath, percentage);
             }
             Log.d("TEST:", "total: " + Long.toString(total) );
             os.flush();

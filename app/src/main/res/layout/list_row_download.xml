@@ -74,6 +74,7 @@
                 style="@android:style/Widget.ProgressBar.Horizontal"
                 android:visibility="visible"
                 android:max="100"
+                android:progress="0"
                 android:background="@android:color/holo_blue_bright"
                 android:id="@+id/send_progress_bar"/>
         </LinearLayout>
