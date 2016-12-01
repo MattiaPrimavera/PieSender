@@ -53,6 +53,9 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     private DownloadLoader mDownloadLoader; /*Loads the list of files from the model in
     a background thread.*/
     private BroadcastReceiver receiver;
+    private long lastRefreshTime;
+    private int economy;
+    private static final int REFRESH_RATE = 3; // milliseconds
 
     public PresenterDownloadManager(DownloadView mView, DownloadModel mModel, Context context, LoaderManager mLoaderManager) {
         this.mView = mView;
@@ -61,6 +64,8 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         this.mData = new ArrayList<Download>();
         this.mContext = context;
         this.mHandler = new Handler();
+        this.lastRefreshTime = System.currentTimeMillis();
+        this.economy = 0;
         this.init();
     }
 
@@ -70,6 +75,7 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         mView.setListAdapter(mDownloadArrayAdapter);
 
         this.startLoader();
+        this.updateUI();
 
         // Declaring a Broadcast Receiver to update The Download UI from Workers notifications
         receiver = new BroadcastReceiver() {
@@ -130,19 +136,30 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
 
     public synchronized void updateModel(String filePath, int progressStatus){
         mModel.updateProgress(filePath, progressStatus);
+        this.updateUI();
         //Log.d("LOGM", "updating Model --> PRESENTER DOWNLOAD MANAGER == " + Integer.toString(progressStatus));
+    }
 
+    public void updateUI(){
         if(mView.isAdded()) {
-            mHandler.post(new Runnable() {
-                public void run() {
-                    updateAdapter(mModel.getAllDownloads());
-                }
-            });
-            // Update the progress bar
+            long currentTime = System.currentTimeMillis();
+            long difference = currentTime - this.lastRefreshTime;
+            Log.d("TEST12", "difference: " + Long.toString(difference) + " --> currentTime : " + Long.toString(currentTime) + " --> " + Long.toString(this.lastRefreshTime));
 
-//            mLoaderManager.getLoader(LOADER_ID).onContentChanged();
-            //mLoaderManager.restartLoader(LOADER_ID, null, this);
-            //this.updateProgressBar();
+            if(difference < REFRESH_RATE){
+                // Limiting refresh rates
+                this.economy++;
+                Log.d("TEST13", "economy: " + Integer.toString(this.economy));
+                return;
+            }
+            else{
+                this.lastRefreshTime = currentTime;
+                mHandler.post(new Runnable() {
+                    public void run() {
+                        updateAdapter(mModel.getAllDownloads());
+                    }
+                });
+            }
         }
     }
 
