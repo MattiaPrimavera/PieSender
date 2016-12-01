@@ -69,14 +69,16 @@ public class FileSender {
             InputStream is = new FileInputStream(file);
             int numRead;
             long total = 0;
+            int oldPercentage = 0;
             while ( ( numRead=is.read(b)) > 0) {
                 total += numRead;
                 os.write(b, 0, numRead);
 
                 int percentage = (int) ((total * 100) / file.length());
-                //Log.d("LOG-file-sending", "--> sendingFile, updating the model: " + Integer.toString(percentage));
-                if(percentage % 5 == 0)
+                if(percentage > oldPercentage){
                     this.updateModel(filePath, percentage);
+                }
+                oldPercentage = percentage;
             }
             Log.d("TEST:", "total: " + Long.toString(total) );
             os.flush();
