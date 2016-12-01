@@ -7,23 +7,18 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TableLayout;
-import android.widget.TextView;
 import android.widget.Toast;
-import com.xtech.sultano.optimizedfilesender.Client.FileSenderRunnable;
+
 import com.xtech.sultano.optimizedfilesender.FileArrayAdapter;
 import com.xtech.sultano.optimizedfilesender.R;
+import com.xtech.sultano.optimizedfilesender.service.FileSenderService;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
 import com.xtech.sultano.optimizedfilesender.model.Model.Model;
 import java.io.File;
@@ -43,7 +38,6 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
     private final int LOADER_ID = 101;
     private Context mContext;
     private LoaderManager mLoaderManager;
-    private FileSenderManager mFileSenderManager;
     private FileLoader mFileLoader; /*Loads the list of files from the model in
     a background thread.*/
 
@@ -55,8 +49,6 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         this.mContext = context;
         this.init();
     }
-
-    public void setFileSenderManager(FileSenderManager mFileSenderManager){ this.mFileSenderManager = mFileSenderManager; }
 
     private void init() {
         //Instantiate and configure the file adapter with an empty list that our loader will update..
@@ -119,7 +111,9 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
             // We're connected
-            mFileSenderManager.createSendFileThread(filePath);
+            Intent intent = new Intent(mContext, FileSenderService.class);
+            intent.putExtra(FileSenderService.FILE_PATH_EXTRA, filePath);
+            mContext.startService(intent);
         }
         else { // Make a toast to warn the user!
             this.makeToast("No Network connections available :(");

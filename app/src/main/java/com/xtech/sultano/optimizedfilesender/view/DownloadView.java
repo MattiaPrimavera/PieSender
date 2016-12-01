@@ -105,6 +105,7 @@ public class DownloadView extends ListFragment {
     @Override
     public void onStop() {
         super.onStop();
+        mPresenterDownloadManager.onStop();
     }
 
     @Override

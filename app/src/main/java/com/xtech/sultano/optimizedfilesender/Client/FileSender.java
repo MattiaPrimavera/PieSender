@@ -1,6 +1,8 @@
 package com.xtech.sultano.optimizedfilesender.Client;
 
+import android.content.Intent;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 
@@ -21,21 +23,26 @@ import java.util.List;
 import static java.lang.Thread.sleep;
 
 public class FileSender {
+    public static final String INTENT_NAME = "download-ui-update";
+    public static final String INTENT_ACTION =
+        "com.xtech.optimizedfilesender.INTENT_ACTION";
+    public static final String INTENT_ACTION_VALUE = "statusUpdate";
+    public static final String EXTENDED_DATA_FILEPATH =
+        "ccom.xtech.optimizedfilesender.FILEPATH";
+    public static final String EXTENDED_DATA_PERCENTAGE =
+        "com.xtech.optimizedfilesender.PERCENTAGE";
+
     // host and port of receiver
     private int port;
     private String host;
     private View rowView;
-    private PresenterFileManager mPresenterFileManager;
-    private PresenterDownloadManager mPresenterDownloadManager;
+    private LocalBroadcastManager mLocalBroadcastManager;
     private Handler mHandler;
 
-    public FileSender(int port, String host, PresenterFileManager mPresenterFileManager, PresenterDownloadManager mPresenterDownloadManager){
+    public FileSender(int port, String host, LocalBroadcastManager localBroadcastManager){
+        this.mLocalBroadcastManager = localBroadcastManager;
         this.port = 8000;
         this.host = "192.168.0.13";
-        this.rowView = rowView;
-        this.mPresenterFileManager = mPresenterFileManager;
-        this.mPresenterDownloadManager = mPresenterDownloadManager;
-        this.mHandler = mHandler;
     }
 
     public long sendFile(String filePath, boolean tree){
@@ -68,8 +75,8 @@ public class FileSender {
 
                 int percentage = (int) ((total * 100) / file.length());
                 //Log.d("LOG-file-sending", "--> sendingFile, updating the model: " + Integer.toString(percentage));
-                if(percentage % 10 == 0)
-                    mPresenterDownloadManager.updateModel(filePath, percentage);
+                if(percentage % 5 == 0)
+                    this.updateModel(filePath, percentage);
             }
             Log.d("TEST:", "total: " + Long.toString(total) );
             os.flush();
@@ -90,7 +97,7 @@ public class FileSender {
             os = socket.getOutputStream();
         } catch (java.net.ConnectException enet){
             enet.printStackTrace();
-            // Start lengthy operation in a background thread
+/*            // Start lengthy operation in a background thread
             new Thread(new Runnable() {
                 public void run() {
                     // Update the progress bar
@@ -100,7 +107,7 @@ public class FileSender {
                         }
                     });
                 }
-            }).start();
+            }).start();*/
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -132,7 +139,7 @@ public class FileSender {
 
                     int percentage = (int)((total * 100) / file.length());
 //                    Log.d("LOGM", "--> sendingFiles, updating the model");
-                    mPresenterDownloadManager.updateModel(file.getPath(), percentage);
+                    this.updateModel(file.getPath(), percentage);
                 }
                 Log.d("TEST:", "total: " + Long.toString(total) );
                 os.flush();
@@ -175,7 +182,7 @@ public class FileSender {
                 int percentage = (int)((totalSent * 100) / totalSize);
 
 //                Log.d("LOGM", "sendDirectory updating the model ..." + Integer.toString(percentage));
-                mPresenterDownloadManager.updateModel(directoryPath, percentage);
+                this.updateModel(directoryPath, percentage);
             }
         }
         catch (Exception ex) {
@@ -207,5 +214,20 @@ public class FileSender {
         }
         Collections.sort(files);
         return files;
+    }
+
+    public void updateModel(String filepath, int percentage){
+        /*
+         * Creates a new Intent containing a Uri object
+         * BROADCAST_ACTION is a custom Intent action
+         */
+        Intent localIntent = new Intent(INTENT_NAME)
+                // Puts the status into the Intent
+                .putExtra(INTENT_ACTION, INTENT_ACTION_VALUE)
+                .putExtra(EXTENDED_DATA_FILEPATH, filepath)
+                .putExtra(EXTENDED_DATA_PERCENTAGE, Integer.toString(percentage));
+        // Broadcasts the Intent to receivers in this app.
+        Log.d("TEST10", "sending broadcast message");
+        mLocalBroadcastManager.sendBroadcast(localIntent);
     }
 }

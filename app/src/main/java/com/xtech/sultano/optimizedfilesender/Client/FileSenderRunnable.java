@@ -1,6 +1,9 @@
 package com.xtech.sultano.optimizedfilesender.Client;
 
+import android.content.Intent;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.View;
 
 import com.xtech.sultano.optimizedfilesender.observer.Observer;
@@ -13,28 +16,27 @@ import java.util.ArrayList;
 
 public class FileSenderRunnable implements Runnable, Subject {
     private String filePath;
-    private PresenterFileManager mPresenterFileManager;
-    private PresenterDownloadManager mPresenterDownloadManager;
     private FileSender fileSender;
     private ArrayList<Observer> mObserverList;
+    private LocalBroadcastManager localBroadcastManager;
 
-    public FileSenderRunnable(PresenterFileManager mPresenterFileManager, PresenterDownloadManager mPresenterDownloadManager, String filePath){
+    public FileSenderRunnable(LocalBroadcastManager localBroadcastManager, String filePath){
         this.filePath = filePath;
-        this.mPresenterFileManager = mPresenterFileManager;
-        this.mPresenterDownloadManager = mPresenterDownloadManager;
+        this.localBroadcastManager = localBroadcastManager;
     }
 
     public void run(){
         try {
             //Informing PresenterDownloadManager of new download
             File fileToSend = new File(this.filePath);
-            mPresenterDownloadManager.addDownload(fileToSend);
+            Log.d("TEST10", "fileSenderrunnable sending a new file");
+
             if(fileToSend.isDirectory()){
-                fileSender = new FileSender(8000, "localhost", mPresenterFileManager, mPresenterDownloadManager);
+                fileSender = new FileSender(8000, "localhost", localBroadcastManager);
                 fileSender.sendDirectory(filePath);
                 this.notifyObservers();
             }else{
-                fileSender = new FileSender(8000, "localhost", mPresenterFileManager, mPresenterDownloadManager);
+                fileSender = new FileSender(8000, "localhost", localBroadcastManager);
                 fileSender.sendFile(this.filePath, false);
                 this.notifyObservers();
             }

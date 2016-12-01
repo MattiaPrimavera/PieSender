@@ -4,15 +4,15 @@ import android.content.Context;
 import android.support.v4.app.LoaderManager;
 import android.util.Log;
 
-import com.xtech.sultano.optimizedfilesender.model.Model.Download;
 import com.xtech.sultano.optimizedfilesender.model.Model.DownloadModel;
 import com.xtech.sultano.optimizedfilesender.model.Model.Model;
+import com.xtech.sultano.optimizedfilesender.service.FileSenderService;
 import com.xtech.sultano.optimizedfilesender.view.DownloadView;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
 
 public class PresenterFactory<T extends PresenterFileManager> {
     private Model mModel;
-    private FileSenderManager mFileSenderManager;
+    private FileSenderService mFileSenderService;
     private DownloadModel mDownloadModel;
     private UiView mUiView;
     private DownloadView mDownloadView;
@@ -31,8 +31,6 @@ public class PresenterFactory<T extends PresenterFileManager> {
         Log.d("TEST:", mContext.toString());
         mPresenterDownloadManager = new PresenterDownloadManager(downloadView, mDownloadModel, mContext, mLoaderManager);
         mPresenterFileManager = new PresenterFileManager(mUiView, mModel, mContext, this.mLoaderManager);
-        mFileSenderManager = new FileSenderManager(mPresenterDownloadManager, mPresenterFileManager);
-        mPresenterFileManager.setFileSenderManager(mFileSenderManager);
     }
 
     // Singleton design pattern

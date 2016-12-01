@@ -1,8 +1,10 @@
 package com.xtech.sultano.optimizedfilesender.presenter;
 
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -11,6 +13,7 @@ import android.os.Handler;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -21,12 +24,15 @@ import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.xtech.sultano.optimizedfilesender.Client.FileSender;
 import com.xtech.sultano.optimizedfilesender.Client.FileSenderRunnable;
 import com.xtech.sultano.optimizedfilesender.DownloadArrayAdapter;
 import com.xtech.sultano.optimizedfilesender.DownloadArrayAdapter;
 import com.xtech.sultano.optimizedfilesender.R;
 import com.xtech.sultano.optimizedfilesender.model.Model.Download;
 import com.xtech.sultano.optimizedfilesender.model.Model.DownloadModel;
+import com.xtech.sultano.optimizedfilesender.service.FileSenderService;
 import com.xtech.sultano.optimizedfilesender.view.DownloadView;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
 import com.xtech.sultano.optimizedfilesender.model.Model.Model;
@@ -46,6 +52,7 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     private LoaderManager mLoaderManager;
     private DownloadLoader mDownloadLoader; /*Loads the list of files from the model in
     a background thread.*/
+    private BroadcastReceiver receiver;
 
     public PresenterDownloadManager(DownloadView mView, DownloadModel mModel, Context context, LoaderManager mLoaderManager) {
         this.mView = mView;
@@ -63,6 +70,34 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         mView.setListAdapter(mDownloadArrayAdapter);
 
         this.startLoader();
+
+        // Declaring a Broadcast Receiver to update The Download UI from Workers notifications
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String messageType = intent.getStringExtra(FileSender.INTENT_ACTION);
+                String filepath = null;
+
+                // do something here.
+                switch(messageType){
+                    case FileSender.INTENT_ACTION_VALUE: // Transfer progress update notification
+                        filepath = intent.getExtras().getString(FileSender.EXTENDED_DATA_FILEPATH);
+                        int percentage = Integer.parseInt(intent.getExtras().getString(FileSender.EXTENDED_DATA_PERCENTAGE));
+                        Log.d("TEST10", "Receiving progress bar notification");
+                        updateModel(filepath, percentage);
+                        break;
+                    case FileSenderService.INTENT_ACTION_VALUE: // New downlaod notification
+                        Log.d("TEST10", "Receiving new Download notification");
+                        filepath = intent.getExtras().getString(FileSenderService.EXTENDED_DATA_FILEPATH);
+                        addDownload(new File(filepath));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+
+        LocalBroadcastManager.getInstance(mContext).registerReceiver((receiver), new IntentFilter(FileSender.INTENT_NAME));
         //Grab our first list of results from our loader.  onFinishLoad() will call updataAdapter().
         //mDownloadLoader = new DownloadLoader(mView.getActivity());
     }
@@ -205,5 +240,10 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     public void onResume(){
         Log.d("LOGDownloader", "onResume PresenterDownloadManager");
         this.startLoader();
+    }
+
+    public void onStop(){
+        Log.d("LOGDownloader", "onStop PresenterDownloadManager");
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(receiver);
     }
 }
