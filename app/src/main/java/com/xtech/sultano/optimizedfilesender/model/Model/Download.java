@@ -1,8 +1,10 @@
 package com.xtech.sultano.optimizedfilesender.model.Model;
 
+import android.support.annotation.NonNull;
+
 import java.io.File;
 
-public class Download {
+public class Download implements Comparable<Download>{
     private File file;
     private long dimension;
     private boolean isDir;
@@ -27,5 +29,12 @@ public class Download {
 
     public String toString(Download d){
         return this.file + " " + Long.toString(this.dimension) + " " + Boolean.toString(this.isDir);
+    }
+
+    @Override
+    public int compareTo(Download d) {
+        if(d.getProgress() == this.progress)
+            return d.getDimension() > this.dimension ? 1 : -1;
+        return d.getProgress() > this.progress ? 1 : -1;
     }
 }

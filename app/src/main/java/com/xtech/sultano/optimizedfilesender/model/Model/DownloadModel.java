@@ -3,6 +3,9 @@ package com.xtech.sultano.optimizedfilesender.model.Model;
 import android.util.Log;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class DownloadModel {
@@ -17,6 +20,12 @@ public class DownloadModel {
     }
 
     public List<Download> getAllDownloads(){
+        Collections.sort(this.mDownloadList, new Comparator<Download>() {
+            @Override
+            public int compare(Download d1, Download d2) {
+                return  d1.compareTo(d2);
+            }
+        });
         return this.mDownloadList;
     }
 
