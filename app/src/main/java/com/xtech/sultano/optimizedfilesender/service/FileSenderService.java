@@ -39,7 +39,6 @@ public class FileSenderService extends Service implements Observer{
     }
 
     public void createSendFileThread(String filePath){
-        Log.d("TEST10", "creating SendFilethread");
         FileSenderRunnable fileSenderRunnable = new FileSenderRunnable(this.mLocalBroadCastManager, filePath);
         fileSenderRunnable.register(this);
         this.mThreadQueue.enqueue(new Thread(fileSenderRunnable));
@@ -71,7 +70,6 @@ public class FileSenderService extends Service implements Observer{
         public void handleMessage(Message msg) {
             // Normally we would do some work here, like download a file.
             // For our sample, we just sleep for 5 seconds.
-            Log.d("TEST10", "handlingMessage : " + msg.obj);
             createSendFileThread((String)msg.obj);
             // Stop the service using the startId, so that we don't stop
             // the service in the middle of handling another job

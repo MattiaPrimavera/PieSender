@@ -92,7 +92,7 @@ public class DownloadArrayAdapter extends ArrayAdapter<Download> {
         //Set the progress Status
         TextView progressBarText = (TextView) v.findViewById(R.id.download_progressbar_label);
         
-        float fileSize = file.length() / 1024 / 1024;
+        float fileSize = d.getDimension() / 1024 / 1024;
         float sentData = d.getSentData() / 1024 / 1024;
         progressBarText.setText(String.format("%d%% - %.2f / %.2f Mb", d.getProgress(), sentData, fileSize));
 

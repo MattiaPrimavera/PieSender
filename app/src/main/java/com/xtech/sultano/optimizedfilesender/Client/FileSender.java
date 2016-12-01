@@ -6,8 +6,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 
-import com.xtech.sultano.optimizedfilesender.presenter.PresenterDownloadManager;
-import com.xtech.sultano.optimizedfilesender.presenter.PresenterFileManager;
+import com.xtech.sultano.optimizedfilesender.utils.FileUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,26 +19,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static java.lang.Thread.sleep;
-
 public class FileSender {
     public static final String INTENT_NAME = "download-ui-update";
-    public static final String INTENT_ACTION =
-        "com.xtech.optimizedfilesender.INTENT_ACTION";
+    public static final String INTENT_ACTION = "com.xtech.optimizedfilesender.INTENT_ACTION";
     public static final String INTENT_ACTION_VALUE = "statusUpdate";
-    public static final String EXTENDED_DATA_FILEPATH =
-        "ccom.xtech.optimizedfilesender.FILEPATH";
-    public static final String EXTENDED_DATA_PERCENTAGE =
-        "com.xtech.optimizedfilesender.PERCENTAGE";
-    public static final String EXTENDED_DATA_SENT =
-            "com.xtech.optimizedfilesender.SENT_DATA";
+    public static final String EXTENDED_DATA_FILEPATH = "com.xtech.optimizedfilesender.FILEPATH";
+    public static final String EXTENDED_DATA_PERCENTAGE = "com.xtech.optimizedfilesender.PERCENTAGE";
+    public static final String EXTENDED_DATA_SENT = "com.xtech.optimizedfilesender.SENT_DATA";
 
     // host and port of receiver
     private int port;
     private String host;
-    private View rowView;
     private LocalBroadcastManager mLocalBroadcastManager;
-    private Handler mHandler;
 
     public FileSender(int port, String host, LocalBroadcastManager localBroadcastManager){
         this.mLocalBroadcastManager = localBroadcastManager;
@@ -92,6 +83,7 @@ public class FileSender {
             return -1;
         }
     }
+
 
     public OutputStream establishConnection(String host, int port){
         Socket socket;
@@ -157,67 +149,73 @@ public class FileSender {
 
     public void sendDirectory(String directoryPath){
         File directory = new File(directoryPath);
-        List<File> allFiles = this.getAllFilesRecursively(directory);
+        List<File> allFiles = FileUtils.getAllFilesRecursively(directory);
 
         // Returning on Empty file list
         if(allFiles.size() == 0)
             return;
 
+        OutputStream os = null;
         try {
             int cnt_files = allFiles.size();
             long totalSize = 0;
 
             // Calculating total file size
-            Log.d("TEST:", "calculating total file size");
+            Log.d("LOG18", "TOTAL File Number: " + Integer.toString(cnt_files));
             for(int i = 0; i < cnt_files; i++){
                 //Log.d("TEST: ", Integer.toString(i) + " --> " + allFiles.get(i).getName());
                 totalSize += allFiles.get(i).length();
             }
-            Log.d("TEST:", "total size found : " + Long.toString(totalSize));
+            Log.d("LOG16", "total size found : " + Long.toString(totalSize));
 
             long totalSent = 0;
-
             // Looping through all files contained and sending them
-            for (int cur_file=0; cur_file<cnt_files; cur_file++) {
+            for (int cur_file = 0; cur_file < cnt_files; cur_file++) {
+                os = this.establishConnection(host, port);
+
                 File file = allFiles.get(cur_file);
-                long total = this.sendFile(file.getPath(), true);
+                long fileSize = file.length();
 
-                totalSent += total;
-                int percentage = (int)((totalSent * 100) / totalSize);
+                // How many files?
+                ByteStream.toStream(os, cnt_files);
 
-//                Log.d("LOGM", "sendDirectory updating the model ..." + Integer.toString(percentage));
-                this.updateModel(directoryPath, percentage, totalSent);
+                // Sending the filePath if needing to recreate same tree structure on destination machine
+                boolean tree = true; // I temporarily consider tree = true here
+                if(tree){
+                    ByteStream.toStream(os, file.getPath());
+                }else {
+                    ByteStream.toStream(os, file.getName());
+                }
+
+                // Sending file length
+                ByteStream.toStream(os, fileSize);
+
+                byte b[] = new byte[1024];
+                InputStream is = new FileInputStream(file);
+                int numRead;
+                int oldPercentage = 0;
+                while ( ( numRead=is.read(b)) > 0) {
+                    totalSent += numRead;
+                    os.write(b, 0, numRead);
+
+                    int percentage = (int) ((totalSent * 100) / totalSize);
+                    //Log.d("LOG16", "current Percentage : " + Integer.toString(percentage));
+                    Log.d("LOG16", "total Sent : " + Long.toString(totalSent));
+                    if(percentage > oldPercentage){
+                        this.updateModel(directoryPath, percentage, totalSent);
+                        Log.d("LOG16", "sendDirectory updating the model ..." + Integer.toString(percentage));
+                    }
+                    oldPercentage = percentage;
+                }
+                Log.d("LOG16", "sending file number: " + Integer.toString(cur_file));
+
+                os.flush();
+                os.close();
             }
         }
         catch (Exception ex) {
             ex.printStackTrace();
         }
-
-    }
-
-    public List<File> getAllFilesRecursively(File file){
-        File[] allFiles = file.listFiles();
-        /*for(int i = 0; i < allFiles.length; i++){
-            Log.d("TEST: filelist: ", Integer.toString(i) + allFiles[i].getName());
-        }*/
-
-        List<File> files = new ArrayList<>();
-
-        for (File f : allFiles) {
-            if (f.isDirectory()) {
-                List<File> result = getAllFilesRecursively(f);
-                for(int i = 0; i < result.size(); i++){
-                    File resultFile = result.get(i);
-                    if(resultFile.length() > 0)
-                        files.add(result.get(i));
-                }
-            } else {
-                if(f.length() > 0)
-                    files.add(f);
-            }
-        }
-        Collections.sort(files);
-        return files;
     }
 
     public void updateModel(String filepath, int percentage, long sentData){

@@ -33,6 +33,7 @@ import com.xtech.sultano.optimizedfilesender.R;
 import com.xtech.sultano.optimizedfilesender.model.Model.Download;
 import com.xtech.sultano.optimizedfilesender.model.Model.DownloadModel;
 import com.xtech.sultano.optimizedfilesender.service.FileSenderService;
+import com.xtech.sultano.optimizedfilesender.utils.FileUtils;
 import com.xtech.sultano.optimizedfilesender.view.DownloadView;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
 import com.xtech.sultano.optimizedfilesender.model.Model.Model;
@@ -123,7 +124,13 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     }
 
     public synchronized void addDownload(File f){
-        mModel.addDownload(new Download(f, f.length(), f.isDirectory(), 0));
+        long totalLength = 0;
+        if(f.isDirectory()){
+            totalLength = FileUtils.getDirSize(f);
+        }else{
+            totalLength = f.length();
+        }
+        mModel.addDownload(new Download(f, totalLength, f.isDirectory(), 0));
         if(mView.isAdded()) {
             //mDownloadLoader.onContentChanged();
 //            mLoaderManager.restartLoader(LOADER_ID, null, this);
