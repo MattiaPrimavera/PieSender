@@ -31,6 +31,8 @@ public class FileSender {
         "ccom.xtech.optimizedfilesender.FILEPATH";
     public static final String EXTENDED_DATA_PERCENTAGE =
         "com.xtech.optimizedfilesender.PERCENTAGE";
+    public static final String EXTENDED_DATA_SENT =
+            "com.xtech.optimizedfilesender.SENT_DATA";
 
     // host and port of receiver
     private int port;
@@ -76,7 +78,7 @@ public class FileSender {
 
                 int percentage = (int) ((total * 100) / file.length());
                 if(percentage > oldPercentage){
-                    this.updateModel(filePath, percentage);
+                    this.updateModel(filePath, percentage, total);
                 }
                 oldPercentage = percentage;
             }
@@ -141,7 +143,7 @@ public class FileSender {
 
                     int percentage = (int)((total * 100) / file.length());
 //                    Log.d("LOGM", "--> sendingFiles, updating the model");
-                    this.updateModel(file.getPath(), percentage);
+                    this.updateModel(file.getPath(), percentage, total);
                 }
                 Log.d("TEST:", "total: " + Long.toString(total) );
                 os.flush();
@@ -184,7 +186,7 @@ public class FileSender {
                 int percentage = (int)((totalSent * 100) / totalSize);
 
 //                Log.d("LOGM", "sendDirectory updating the model ..." + Integer.toString(percentage));
-                this.updateModel(directoryPath, percentage);
+                this.updateModel(directoryPath, percentage, totalSent);
             }
         }
         catch (Exception ex) {
@@ -218,7 +220,7 @@ public class FileSender {
         return files;
     }
 
-    public void updateModel(String filepath, int percentage){
+    public void updateModel(String filepath, int percentage, long sentData){
         /*
          * Creates a new Intent containing a Uri object
          * BROADCAST_ACTION is a custom Intent action
@@ -227,6 +229,7 @@ public class FileSender {
                 // Puts the status into the Intent
                 .putExtra(INTENT_ACTION, INTENT_ACTION_VALUE)
                 .putExtra(EXTENDED_DATA_FILEPATH, filepath)
+                .putExtra(EXTENDED_DATA_SENT, sentData)
                 .putExtra(EXTENDED_DATA_PERCENTAGE, Integer.toString(percentage));
         // Broadcasts the Intent to receivers in this app.
         Log.d("TEST10", "sending broadcast message");

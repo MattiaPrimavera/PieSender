@@ -56,7 +56,7 @@ public class DownloadModel {
         return this.mDownloadList.get(index);
     }
 
-    public synchronized boolean updateProgress(String filePath, int percentage){
+    public synchronized boolean updateProgress(String filePath, int percentage, long sentData){
         boolean updated = false;
 /*        for(int i=0; i < this.mDownloadList.size(); i++){
             Log.d("TEST2:", Integer.toString(i) + " --> " + this.mDownloadList.get(i).getFile().getPath());
@@ -64,6 +64,7 @@ public class DownloadModel {
         Download d = this.getDownloadByFilePath(filePath);
         if(d != null){
             d.setProgress(percentage);
+            d.setSentData(sentData);
             updated = true;
         }
         return updated;

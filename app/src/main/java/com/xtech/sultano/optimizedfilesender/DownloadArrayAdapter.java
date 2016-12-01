@@ -1,6 +1,9 @@
 package com.xtech.sultano.optimizedfilesender;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,9 +81,6 @@ public class DownloadArrayAdapter extends ArrayAdapter<Download> {
         } else {
             setFileTypeIcon(iv, file);
             iv.setImageResource(R.drawable.pdf);
-            if (file.length() > 0) {
-                detailsView.setText(String.valueOf(file.length()));
-            }
         }
 
         float value = (float) (d.getProgress() / 100.0);
@@ -91,7 +91,10 @@ public class DownloadArrayAdapter extends ArrayAdapter<Download> {
 
         //Set the progress Status
         TextView progressBarText = (TextView) v.findViewById(R.id.download_progressbar_label);
-        progressBarText.setText(Integer.toString(d.getProgress()) + "%");
+        
+        float fileSize = file.length() / 1024 / 1024;
+        float sentData = d.getSentData() / 1024 / 1024;
+        progressBarText.setText(String.format("%d%% - %.2f / %.2f Mb", d.getProgress(), sentData, fileSize));
 
 /*        ProgressBar progressBar = (ProgressBar)v.findViewById(R.id.send_progress_bar);
         progressBar.setProgress(d.getProgress()); */
