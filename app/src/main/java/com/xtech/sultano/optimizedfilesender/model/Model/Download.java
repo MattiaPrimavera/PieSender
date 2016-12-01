@@ -34,7 +34,7 @@ public class Download implements Comparable<Download>{
     @Override
     public int compareTo(Download d) {
         if(d.getProgress() == this.progress)
-            return d.getDimension() > this.dimension ? 1 : -1;
-        return d.getProgress() > this.progress ? 1 : -1;
+            return d.getDimension() > this.dimension ? -1 : 1;
+        return d.getProgress() > this.progress ? -1 : 1;
     }
 }
