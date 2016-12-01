@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.xtech.sultano.optimizedfilesender.model.Model.Download;
@@ -60,21 +61,18 @@ public class DownloadArrayAdapter extends ArrayAdapter<Download> {
 
         if (v == null) {
             LayoutInflater inflater = (LayoutInflater.from(mContext));
-
             v = inflater.inflate(mResource, null);
         }
 
         /* We pull out the ImageView and TextViews so we can set their properties.*/
         ImageView iv = (ImageView) v.findViewById(R.id.iconImageView);
-
         TextView nameView = (TextView) v.findViewById(R.id.name_text_view);
-
         TextView detailsView = (TextView) v.findViewById(R.id.details_text_view);
 
         Download d = getItem(position);
         File file = d.getFile();
 
-        /* If the file is a dir, set the image view's image to a folder, else, a file. */
+        /* Setting the correct Icon */
         if (file.isDirectory()) {
             iv.setImageResource(R.drawable.folder);
         } else {
@@ -85,12 +83,18 @@ public class DownloadArrayAdapter extends ArrayAdapter<Download> {
             }
         }
 
+        float value = (float) (d.getProgress() / 100.0);
+        View bar1 = v.findViewById(R.id.myRectangleView);
+        View bar2 = v.findViewById(R.id.myRectangleView2);
+        bar1.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1 - value));
+        bar2.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, value));
+
         //Set the progress Status
         TextView progressBarText = (TextView) v.findViewById(R.id.download_progressbar_label);
-        progressBarText.setText(Integer.toString(d.getProgress()));
+        progressBarText.setText(Integer.toString(d.getProgress()) + "%");
 
-        ProgressBar progressBar = (ProgressBar)v.findViewById(R.id.send_progress_bar);
-        progressBar.setProgress(d.getProgress());
+/*        ProgressBar progressBar = (ProgressBar)v.findViewById(R.id.send_progress_bar);
+        progressBar.setProgress(d.getProgress()); */
 
         //Finally, set the name of the file or directory.
         nameView.setText(file.getName());
