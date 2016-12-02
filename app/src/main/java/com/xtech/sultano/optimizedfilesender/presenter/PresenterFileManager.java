@@ -1,14 +1,18 @@
 package com.xtech.sultano.optimizedfilesender.presenter;
 
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -18,12 +22,16 @@ import android.widget.Toast;
 
 import com.xtech.sultano.optimizedfilesender.FileArrayAdapter;
 import com.xtech.sultano.optimizedfilesender.R;
+import com.xtech.sultano.optimizedfilesender.service.DiscoveryService;
 import com.xtech.sultano.optimizedfilesender.service.FileSenderService;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
 import com.xtech.sultano.optimizedfilesender.model.Model.Model;
 import java.io.File;
+import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The main job of the presenter is to marshall data to and from the view. Logic in the
@@ -37,12 +45,15 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
     private List<File> mData; //The list of all files for a specific dir.
     private final int LOADER_ID = 101;
     private Context mContext;
+    private BroadcastReceiver mReceiver;
     private LoaderManager mLoaderManager;
+    private boolean mReceiverSet;
     private FileLoader mFileLoader; /*Loads the list of files from the model in
     a background thread.*/
 
     public PresenterFileManager(UiView mView, Model mModel, Context context, LoaderManager mLoaderManager) {
         this.mView = mView;
+        this.mReceiverSet = false;
         this.mLoaderManager = mLoaderManager;
         this.mModel = mModel;
         this.mData = new ArrayList<>();
@@ -105,19 +116,49 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
     }
 
     public void createSendFileThread(String filePath){
-        // Check if network is available
         boolean connected = false;
+        Intent intent;
+
+        // Check if network is available
         ConnectivityManager connectivityManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
             // We're connected
-            Intent intent = new Intent(mContext, FileSenderService.class);
-            intent.putExtra(FileSenderService.FILE_PATH_EXTRA, filePath);
-            mContext.startService(intent);
+
+            // Check if receiver address is set
+            if(!mReceiverSet){
+                Log.d("LOG19", "starting intent to set receiver ... ");
+                this.receiveDiscoveryResponse();
+                intent = new Intent(mContext, DiscoveryService.class);
+                mContext.startService(intent);
+            }else{
+                intent = new Intent(mContext, FileSenderService.class);
+                intent.putExtra(FileSenderService.FILE_PATH_EXTRA, filePath);
+                mContext.startService(intent);
+            }
         }
         else { // Make a toast to warn the user!
+            // We're NOT connected
             this.makeToast("No Network connections available :(");
         }
+    }
+
+    public void receiveDiscoveryResponse(){
+        Log.d("LOG19", "receiveDiscoveryResponse prepared ... ");
+        // Declaring a Broadcast Receiver
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                HashMap<String, InetAddress> discoveryResponse = (HashMap<String, InetAddress>) intent.getSerializableExtra(DiscoveryService.EXTENDED_DISCOVERY_RESULT);
+                Set<String> keys = discoveryResponse.keySet();
+                for(String tmp : keys){
+                    Log.d("LOG19", "discoveryResponse: " + tmp);
+                }
+                // create a list view dialog
+            }
+        };
+
+        LocalBroadcastManager.getInstance(mContext).registerReceiver((mReceiver), new IntentFilter(DiscoveryService.INTENT_NAME));
     }
 
     public boolean longListItemClicked(AdapterView<?> adapter, View rowView, int position, long id) {
@@ -204,7 +245,7 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
     /*Called when the user presses the home button on the ActionBar to navigate back to
      our previous location, if we have one.*/
-    public void homePressed() {
+    public void onBackPressed() {
         //If we have a previous dir to go back to, do it.
         if (mModel.hasmPreviousDir()) {
             mModel.setmCurrentDir(mModel.getmPreviousDir());
