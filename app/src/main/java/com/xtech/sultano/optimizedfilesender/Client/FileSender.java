@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.lang.*;
 import java.io.OutputStream;
 import java.io.File;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,8 +35,8 @@ public class FileSender {
 
     public FileSender(int port, String host, LocalBroadcastManager localBroadcastManager){
         this.mLocalBroadcastManager = localBroadcastManager;
-        this.port = 8000;
-        this.host = "192.168.0.13";
+        this.port = port;
+        this.host = host;
     }
 
     public long sendFile(String filePath, boolean tree){

@@ -28,6 +28,7 @@ public class FileSenderService extends Service implements Observer{
     private LocalBroadcastManager mLocalBroadCastManager;
     public static final String INTENT_NAME = "download-ui-update";
     public static final String FILE_PATH_EXTRA = "filepath";
+    public static final String HOST_EXTRA = "com.xtech.optimizedfilesender.INTENT_ACTION";
     public static final String INTENT_ACTION =
             "com.xtech.optimizedfilesender.INTENT_ACTION";
     public static final String INTENT_ACTION_VALUE = "addDownload";
@@ -38,8 +39,8 @@ public class FileSenderService extends Service implements Observer{
         this.mThreadQueue = new ThreadQueue();
     }
 
-    public void createSendFileThread(String filePath){
-        FileSenderRunnable fileSenderRunnable = new FileSenderRunnable(this.mLocalBroadCastManager, filePath);
+    public void createSendFileThread(String filePath, String host){
+        FileSenderRunnable fileSenderRunnable = new FileSenderRunnable(this.mLocalBroadCastManager, filePath, host);
         fileSenderRunnable.register(this);
         this.mThreadQueue.enqueue(new Thread(fileSenderRunnable));
 
@@ -55,7 +56,7 @@ public class FileSenderService extends Service implements Observer{
     }
 
     @Override
-    public void update() {
+    public void update(Object o) {
         this.mThreadQueue.decreaseActiveThreads();
         this.startNextThread();
     }
@@ -70,7 +71,11 @@ public class FileSenderService extends Service implements Observer{
         public void handleMessage(Message msg) {
             // Normally we would do some work here, like download a file.
             // For our sample, we just sleep for 5 seconds.
-            createSendFileThread((String)msg.obj);
+            String[] info = (String[])msg.obj;
+            String filepath = info[0];
+            String host = info[1];
+
+            createSendFileThread(filepath, host);
             // Stop the service using the startId, so that we don't stop
             // the service in the middle of handling another job
 //            stopSelf(msg.arg1);
@@ -100,12 +105,14 @@ public class FileSenderService extends Service implements Observer{
 
         // Set the file path of the file to send inside the obj field of the Message
         String filepath = intent.getExtras().getString(FILE_PATH_EXTRA);
+        String host = intent.getExtras().getString(HOST_EXTRA);
+        String[] info = { filepath, host};
 
         // For each start request, send a message to start a job and deliver the
         // start ID so we know which request we're stopping when we finish the job
         Message msg = mServiceHandler.obtainMessage();
         msg.arg1 = startId;
-        msg.obj = filepath;
+        msg.obj = info;
         mServiceHandler.sendMessage(msg);
 
         // If we get killed, after returning from here, restart

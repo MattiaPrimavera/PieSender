@@ -1,27 +1,24 @@
 package com.xtech.sultano.optimizedfilesender.Client;
 
-import android.content.Intent;
-import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.View;
-
 import com.xtech.sultano.optimizedfilesender.observer.Observer;
 import com.xtech.sultano.optimizedfilesender.observer.Subject;
-import com.xtech.sultano.optimizedfilesender.presenter.PresenterDownloadManager;
-import com.xtech.sultano.optimizedfilesender.presenter.PresenterFileManager;
-
 import java.io.File;
+import java.net.InetAddress;
 import java.util.ArrayList;
 
 public class FileSenderRunnable implements Runnable, Subject {
     private String filePath;
     private FileSender fileSender;
     private ArrayList<Observer> mObserverList;
+    private String host;
     private LocalBroadcastManager localBroadcastManager;
+    private static final int PORT = 8000;
 
-    public FileSenderRunnable(LocalBroadcastManager localBroadcastManager, String filePath){
+    public FileSenderRunnable(LocalBroadcastManager localBroadcastManager, String filePath, String host){
         this.filePath = filePath;
+        this.host = host;
         this.localBroadcastManager = localBroadcastManager;
     }
 
@@ -32,13 +29,13 @@ public class FileSenderRunnable implements Runnable, Subject {
             Log.d("TEST10", "fileSenderrunnable sending a new file");
 
             if(fileToSend.isDirectory()){
-                fileSender = new FileSender(8000, "localhost", localBroadcastManager);
+                fileSender = new FileSender(PORT, host, localBroadcastManager);
                 fileSender.sendDirectory(filePath);
-                this.notifyObservers();
+                this.notifyObservers(null);
             }else{
-                fileSender = new FileSender(8000, "localhost", localBroadcastManager);
+                fileSender = new FileSender(PORT, host, localBroadcastManager);
                 fileSender.sendFile(this.filePath, false);
-                this.notifyObservers();
+                this.notifyObservers(null);
             }
         }catch(Exception e){
             e.printStackTrace();
@@ -60,9 +57,9 @@ public class FileSenderRunnable implements Runnable, Subject {
     }
 
     @Override
-    public void notifyObservers() {
+    public void notifyObservers(Object o) {
         for(int i = 0; i < mObserverList.size(); i++){
-            mObserverList.get(i).update();
+            mObserverList.get(i).update(null);
         }
     }
 }

@@ -22,8 +22,10 @@ import android.widget.Toast;
 
 import com.xtech.sultano.optimizedfilesender.FileArrayAdapter;
 import com.xtech.sultano.optimizedfilesender.R;
+import com.xtech.sultano.optimizedfilesender.observer.Observer;
 import com.xtech.sultano.optimizedfilesender.service.DiscoveryService;
 import com.xtech.sultano.optimizedfilesender.service.FileSenderService;
+import com.xtech.sultano.optimizedfilesender.view.ConnectDialog;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
 import com.xtech.sultano.optimizedfilesender.model.Model.Model;
 import java.io.File;
@@ -38,7 +40,7 @@ import java.util.Set;
  * presenter is kept to a minimum, with only the logic required to format and marshall data between
  * the view and model done here.
  **/
-public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<File>> {
+public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<File>>, Observer {
     private UiView mView; //Our view.
     private Model mModel; //Our model.
     private FileArrayAdapter mFileArrayAdapter; //The adapter containing data for our list.
@@ -47,7 +49,9 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
     private Context mContext;
     private BroadcastReceiver mReceiver;
     private LoaderManager mLoaderManager;
+    private HashMap<String, InetAddress> mDiscoveryResponse;
     private boolean mReceiverSet;
+    private InetAddress mDestAddr;
     private FileLoader mFileLoader; /*Loads the list of files from the model in
     a background thread.*/
 
@@ -58,6 +62,8 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         this.mModel = mModel;
         this.mData = new ArrayList<>();
         this.mContext = context;
+        this.mDiscoveryResponse = null;
+        this.mDestAddr = null;
         this.init();
     }
 
@@ -126,15 +132,13 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
             // We're connected
 
             // Check if receiver address is set
-            if(!mReceiverSet){
+            if(!mReceiverSet){ // ----> TO-DO: This should be saved into Android preferences
                 Log.d("LOG19", "starting intent to set receiver ... ");
                 this.receiveDiscoveryResponse();
                 intent = new Intent(mContext, DiscoveryService.class);
                 mContext.startService(intent);
             }else{
-                intent = new Intent(mContext, FileSenderService.class);
-                intent.putExtra(FileSenderService.FILE_PATH_EXTRA, filePath);
-                mContext.startService(intent);
+                this.startSendFileService(filePath);
             }
         }
         else { // Make a toast to warn the user!
@@ -143,22 +147,42 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         }
     }
 
+    public void startSendFileService(String filePath){
+        Intent intent = new Intent(mContext, FileSenderService.class);
+        intent.putExtra(FileSenderService.FILE_PATH_EXTRA, filePath);
+        String destination = mDestAddr.toString();
+        intent.putExtra(FileSenderService.HOST_EXTRA, destination.substring(1, destination.length()));
+        mContext.startService(intent);
+    }
+
     public void receiveDiscoveryResponse(){
         Log.d("LOG19", "receiveDiscoveryResponse prepared ... ");
         // Declaring a Broadcast Receiver
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                // Getting the Discovery Response
                 HashMap<String, InetAddress> discoveryResponse = (HashMap<String, InetAddress>) intent.getSerializableExtra(DiscoveryService.EXTENDED_DISCOVERY_RESULT);
-                Set<String> keys = discoveryResponse.keySet();
-                for(String tmp : keys){
-                    Log.d("LOG19", "discoveryResponse: " + tmp);
-                }
-                // create a list view dialog
+                pickConnectionDialog(discoveryResponse);
             }
         };
 
         LocalBroadcastManager.getInstance(mContext).registerReceiver((mReceiver), new IntentFilter(DiscoveryService.INTENT_NAME));
+    }
+
+    public void pickConnectionDialog(HashMap<String, InetAddress> discoveryResponse){
+        this.mDiscoveryResponse = discoveryResponse;
+
+        // create a list view dialog
+        Set<String> keys = discoveryResponse.keySet();
+        for(String tmp : keys){
+            Log.d("LOG19", "discoveryResponse: " + tmp);
+        }
+        String[] serverNames = keys.toArray(new String[keys.size()]);
+
+        ConnectDialog connect = new ConnectDialog(serverNames);
+        connect.register(this);
+        connect.show(mView.getActivity().getSupportFragmentManager(), "connect-dialog");
     }
 
     public boolean longListItemClicked(AdapterView<?> adapter, View rowView, int position, long id) {
@@ -278,5 +302,12 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
     public void onResume(){
         this.startLoader();
+    }
+
+    @Override
+    public void update(Object o) { // Receives the ServerName picked up from the user as a destination
+        this.mReceiverSet = true;
+        String serverName = (String)o;
+        this.mDestAddr = this.mDiscoveryResponse.get(serverName);
     }
 }
