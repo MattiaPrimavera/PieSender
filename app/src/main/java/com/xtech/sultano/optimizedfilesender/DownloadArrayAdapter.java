@@ -68,15 +68,11 @@ public class DownloadArrayAdapter extends ArrayAdapter<Download> {
         TextView detailsView = (TextView) v.findViewById(R.id.details_text_view);
 
         Download d = getItem(position);
-        File file = d.getFile();
+        String filename = d.getFileName();
 
         /* Setting the correct Icon */
-        if (file.isDirectory()) {
-            iv.setImageResource(R.drawable.folder);
-        } else {
-            setFileTypeIcon(iv, file);
-            iv.setImageResource(R.drawable.pdf);
-        }
+        setFileTypeIcon(iv, filename);
+        iv.setImageResource(R.drawable.pdf);
 
         float value = (float) (d.getProgress() / 100.0);
         View bar1 = v.findViewById(R.id.myRectangleView);
@@ -95,7 +91,7 @@ public class DownloadArrayAdapter extends ArrayAdapter<Download> {
         progressBar.setProgress(d.getProgress()); */
 
         //Finally, set the name of the file or directory.
-        nameView.setText(file.getName());
+        nameView.setText(filename);
 
         LinearLayout listItemInfo = (LinearLayout) v.findViewById(R.id.listeitem_info_layout);
         listItemInfo.bringToFront();
@@ -104,8 +100,7 @@ public class DownloadArrayAdapter extends ArrayAdapter<Download> {
         return v;
     }
 
-    public void setFileTypeIcon(ImageView icon, File file){
-        String fileName = file.getName();
+    public void setFileTypeIcon(ImageView icon, String fileName){
         Context context = icon.getContext();
         int id = R.drawable.raw;
         if(fileName.indexOf('.') >= 0) {

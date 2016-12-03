@@ -1,5 +1,7 @@
 package com.xtech.sultano.optimizedfilesender.server;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -20,22 +22,22 @@ public class DiscoveryThread implements Runnable {
     public void sendResponse(DatagramSocket socket, byte[] sendData, DatagramPacket packet) throws IOException{
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, packet.getAddress(), packet.getPort());
         socket.send(sendPacket);
-        System.out.println(getClass().getName() + ">>>Sent packet to: " + sendPacket.getAddress().getHostAddress());
+        Log.d("LOG20", getClass().getName() + ">>>Sent packet to: " + sendPacket.getAddress().getHostAddress());
     }
 
     public DiscoveryThread(){
-        this.serverName = "ServerTest1";
+        this.serverName = "android";
     }
 
     public DatagramPacket receiveMessage(DatagramSocket socket) throws IOException{
-        System.out.println(getClass().getName() + ">>>Ready to receive broadcast packets!");
+        Log.d("LOG20", getClass().getName() + ">>>Ready to receive broadcast packets!");
         //Receive a packet
         byte[] recvBuf = new byte[15000];
         DatagramPacket packet = new DatagramPacket(recvBuf, recvBuf.length);
         socket.receive(packet);
         //Packet received
-        System.out.println(getClass().getName() + ">>>Discovery packet received from: " + packet.getAddress().getHostAddress());
-        System.out.println(getClass().getName() + ">>>Packet received; data: " + new String(packet.getData()));
+        Log.d("LOG20", getClass().getName() + ">>>Discovery packet received from: " + packet.getAddress().getHostAddress());
+        Log.d("LOG20", getClass().getName() + ">>>Packet received; data: " + new String(packet.getData()));
         return packet;
     }
 
@@ -51,8 +53,8 @@ public class DiscoveryThread implements Runnable {
                 //See if the packet holds the right command (message)
                 String message = new String(packet.getData()).trim();
                 if (message.startsWith(DISCOVERY_REQUEST_PREFIX)) {
-                    System.out.println("Client name:");
-                    System.out.println(message.substring(DISCOVERY_REQUEST_PREFIX.length(), message.length()));
+                    Log.d("LOG20", "Client name:");
+                    Log.d("LOG20", message.substring(DISCOVERY_REQUEST_PREFIX.length(), message.length()));
 
                     byte[] sendData = this.makeDiscoveryResponse();
                     this.sendResponse(socket, sendData, packet);

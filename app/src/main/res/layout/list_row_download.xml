@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@android:color/holo_red_dark" />
+            android:background="@android:color/holo_blue_light" />
         <View
             android:id="@+id/myRectangleView2"
             android:layout_width="wrap_content"

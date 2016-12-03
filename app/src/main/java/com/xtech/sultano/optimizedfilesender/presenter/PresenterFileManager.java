@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.xtech.sultano.optimizedfilesender.FileArrayAdapter;
 import com.xtech.sultano.optimizedfilesender.R;
 import com.xtech.sultano.optimizedfilesender.observer.Observer;
+import com.xtech.sultano.optimizedfilesender.server.FileReceiverService;
 import com.xtech.sultano.optimizedfilesender.service.DiscoveryService;
 import com.xtech.sultano.optimizedfilesender.service.FileSenderService;
 import com.xtech.sultano.optimizedfilesender.view.ConnectDialog;
@@ -73,6 +74,12 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         mView.setListAdapter(mFileArrayAdapter);
 
         this.startLoader();
+
+        // Starting Servers: Discovery + Receiver
+        Log.d("LOG20", "starting server threads");
+        this.startReceiveFileService();
+        this.startDiscoveryServerService();
+
         //Grab our first list of results from our loader.  onFinishLoad() will call updataAdapter().
         //mFileLoader = new FileLoader(mContext);
     }
@@ -145,6 +152,18 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
             // We're NOT connected
             this.makeToast("No Network connections available :(");
         }
+    }
+
+    public void startDiscoveryServerService(){
+        Log.d("LOG20", "starting discovery service");
+        Intent intent = new Intent(mContext, DiscoveryService.class);
+        mContext.startService(intent);
+    }
+
+    public void startReceiveFileService(){
+        Log.d("LOG20", "starting file receive service");
+        Intent intent = new Intent(mContext, FileReceiverService.class);
+        mContext.startService(intent);
     }
 
     public void startSendFileService(String filePath){
