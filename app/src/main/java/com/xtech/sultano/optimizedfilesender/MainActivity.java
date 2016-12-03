@@ -16,11 +16,13 @@ import android.view.MenuItem;
 
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterFactory;
 import com.xtech.sultano.optimizedfilesender.view.DownloadView;
+import com.xtech.sultano.optimizedfilesender.view.UploadView;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     private LoaderManager mLoaderManager;
     private UiView mView;
+    private UploadView mUploadView;
     private DownloadView mDownloadView;
     private ViewPager mViewPager;
     private TabLayout tabLayout;
@@ -37,16 +39,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
+
+        // UI Fragments
         mView = UiView.newInstance();
+        mUploadView = UploadView.newInstance();
         mDownloadView = DownloadView.newInstance();
+        
         mLoaderManager = getSupportLoaderManager();
-        mPresenterFactory = new PresenterFactory(mView, mDownloadView, this, mLoaderManager);
+        mPresenterFactory = new PresenterFactory(mView, mUploadView, mDownloadView, this, mLoaderManager);
+
+        // Setting Presenter Factory for UI Fragments
         mView.setPresenterFactory(mPresenterFactory);
+        mUploadView.setPresenterFactory(mPresenterFactory);
         mDownloadView.setPresenterFactory(mPresenterFactory);
 
         // Graphical interface is composed by two views, accessible through a tabbed layout
         mSectionsPagerAdapter.addPage(mView, "ONE");
-        mSectionsPagerAdapter.addPage(mDownloadView, "TWO");
+        mSectionsPagerAdapter.addPage(mUploadView, "TWO");
+        mSectionsPagerAdapter.addPage(mDownloadView, "THREE");
         mViewPager.setAdapter(mSectionsPagerAdapter);
     }
 
@@ -75,7 +85,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            mView.onBackPressed();
+            if(mView.isAdded())
+                mView.onBackPressed();
         }
     }
 

@@ -6,8 +6,7 @@ import android.util.Log;
 
 import com.xtech.sultano.optimizedfilesender.model.Model.Download;
 import com.xtech.sultano.optimizedfilesender.model.Model.DownloadModel;
-import java.io.File;
-import java.util.HashMap;
+
 import java.util.List;
 
 public class DownloadLoader extends AsyncTaskLoader<List<Download>> {
@@ -78,18 +77,18 @@ public class DownloadLoader extends AsyncTaskLoader<List<Download>> {
      * here just adds a little more logic.
      */
     @Override
-    public void deliverResult(List<Download> downloads) {
+    public void deliverResult(List<Download> Downloads) {
         Log.d("LOGDownloader", "deliverResult");
         if (isReset()) {
             // An async query came in while the loader is stopped.  We
             // don't need the result.
-            if (downloads != null) {
-                onReleaseResources(downloads);
+            if (Downloads != null) {
+                onReleaseResources(Downloads);
             }
         }
 
         List<Download> oldDownloads = mData;
-        mData = downloads;
+        mData = Downloads;
 
         if (isStarted()) {
             Log.d("LOGDownloader", "deliverResult isStarted OK");
