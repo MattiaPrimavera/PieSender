@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import com.xtech.sultano.optimizedfilesender.FileArrayAdapter;
 import com.xtech.sultano.optimizedfilesender.R;
 import com.xtech.sultano.optimizedfilesender.observer.Observer;
+import com.xtech.sultano.optimizedfilesender.server.FileReceiver;
 import com.xtech.sultano.optimizedfilesender.server.FileReceiverService;
 import com.xtech.sultano.optimizedfilesender.service.DiscoveryService;
 import com.xtech.sultano.optimizedfilesender.service.FileSenderService;
@@ -68,6 +70,25 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         this.init();
     }
 
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
     private void init() {
         //Instantiate and configure the file adapter with an empty list that our loader will update..
         mFileArrayAdapter = new FileArrayAdapter(mContext, R.layout.list_row, mData);
@@ -77,8 +98,17 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
         // Starting Servers: Discovery + Receiver
         Log.d("LOG20", "starting server threads");
-        this.startReceiveFileService();
-        this.startDiscoveryServerService();
+
+
+        if(isExternalStorageWritable()){
+            this.startReceiveFileService();
+            this.startDiscoveryServerService();
+            Log.d("LOG21", "storage writable");
+        }else{
+            // ERROR!
+            Log.d("LOG21", "storage NON writable");
+        }
+
 
         //Grab our first list of results from our loader.  onFinishLoad() will call updataAdapter().
         //mFileLoader = new FileLoader(mContext);
@@ -162,7 +192,15 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
     public void startReceiveFileService(){
         Log.d("LOG20", "starting file receive service");
+        File dir = Environment.getExternalStorageDirectory();
+        for (File tmp : dir.listFiles()){
+            Log.d("LOG21", tmp.getAbsolutePath());
+        }
+        Log.d("LOG21", "rootDir special " + mContext.getFilesDir());
+        Log.d("LOG21", "rootDir special path" + mContext.getFilesDir().getAbsolutePath());
+
         Intent intent = new Intent(mContext, FileReceiverService.class);
+        intent.putExtra(FileReceiver.EXTENDED_DATA_ROOTDIR, dir.getAbsolutePath());
         mContext.startService(intent);
     }
 

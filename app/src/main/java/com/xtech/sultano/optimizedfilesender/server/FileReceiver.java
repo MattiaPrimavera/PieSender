@@ -21,6 +21,7 @@ public class FileReceiver implements Runnable {
     public static final String INTENT_ACTION = "com.xtech.optimizedfilesender.INTENT_ACTION";
     public static final String INTENT_ACTION_VALUE_UPDATE = "statusUpdate";
     public static final String INTENT_ACTION_VALUE_ADD = "addUpdate";
+    public static final String EXTENDED_DATA_ROOTDIR = "com.xtech.optimizedfilesender.ROOT_DIR";
     public static final String EXTENDED_DATA_FILENAME = "com.xtech.optimizedfilesender.FILENAME";
     public static final String EXTENDED_DATA_PERCENTAGE = "com.xtech.optimizedfilesender.PERCENTAGE";
     public static final String EXTENDED_DATA_RECEIVED = "com.xtech.optimizedfilesender.RECEIVED_DATA";
@@ -29,11 +30,14 @@ public class FileReceiver implements Runnable {
 
     private LocalBroadcastManager mLocalBroadcastManager;
     private Socket socket;
+    private String mRootDir;
 
     public FileReceiver(){}
 
-    public FileReceiver(LocalBroadcastManager localBroadcastManager){
+    public FileReceiver(LocalBroadcastManager localBroadcastManager, String rootDir){
         mLocalBroadcastManager = localBroadcastManager;
+        mRootDir = rootDir + "/Dukto/";
+        Log.d("LOG19", "rootDir : " + mRootDir);
     }
 
     public Socket getSocket(){ return this.socket; }
@@ -59,13 +63,13 @@ public class FileReceiver implements Runnable {
                         Log.d("LOG19", "Pathed filename: " + file_name);
                         filePath = file_name.substring(1, file_name.length());
                         Log.d("LOG19", "filePath modified: " + filePath);
-
                         file = new File(filePath);
                         file.getParentFile().mkdirs();
                         file.createNewFile();
                     }else{
                         Log.d("LOG19", "Unpathed filename: " + file_name);
-                        file = new File(file_name);
+                        file = new File(mRootDir + file_name);
+                        file.createNewFile();
                     }
 
                     // Having a ByteStream.toFile here
@@ -74,7 +78,7 @@ public class FileReceiver implements Runnable {
                     if(filePath != null)
                         this.addUpload(filePath, len);
                     else
-                        this.addUpload(file_name, len);
+                        this.addUpload(mRootDir + file_name, len);
 
                     int buf_size = 1024;
                     FileOutputStream fos = new FileOutputStream(file);
@@ -91,9 +95,13 @@ public class FileReceiver implements Runnable {
                         fos.write(buffer, 0, len_read);
 
                         // Updating Download Model
-                        int percentage = (int) ((len * 100) / file.length());
+                        int percentage = (int) ((total_len_read * 100) / len);
                         if(percentage > oldPercentage){
-                            this.updateModel(filePath, percentage, total_len_read);
+                            Log.d("LOG20", "updating model --> percentage : " + Integer.toString(percentage));
+                            if(filePath != null)
+                                this.updateModel(filePath, percentage, total_len_read);
+                            else
+                                this.updateModel(mRootDir + file_name, percentage, total_len_read);                                
                         }
                         oldPercentage = percentage;
 
@@ -122,7 +130,7 @@ public class FileReceiver implements Runnable {
                 .putExtra(EXTENDED_DATA_RECEIVED, receivedData)
                 .putExtra(EXTENDED_DATA_PERCENTAGE, Integer.toString(percentage));
         // Broadcasts the Intent to receivers in this app.
-        Log.d("LOG19", "TEST10 - sending broadcast message");
+        Log.d("LOG20", "BROADCAST : " + filepath);
         mLocalBroadcastManager.sendBroadcast(localIntent);
     }
 

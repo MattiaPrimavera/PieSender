@@ -23,13 +23,13 @@ public class FileReceiverService extends Service{
         Log.d("LOG20", "FileReceiverService() constructor");
     }
 
-    public void startFileReceiverThread(){
+    public void startFileReceiverThread(String rootDir){
         Log.d("LOG20", "startFileReceiverThread()");
         try {
             ServerSocket listener = new ServerSocket(PORT);
 
             while (true) {
-                FileReceiver file_rec = new FileReceiver(mLocalBroadCastManager);
+                FileReceiver file_rec = new FileReceiver(mLocalBroadCastManager, rootDir);
                 file_rec.setSocket(listener.accept());
 
                 new Thread(file_rec).start();
@@ -52,7 +52,7 @@ public class FileReceiverService extends Service{
             // Normally we would do some work here, like download a file.
             // For our sample, we just sleep for 5 seconds.
             Log.d("LOG20", "handleMessage");
-            startFileReceiverThread();
+            startFileReceiverThread((String)msg.obj);
             // Stop the service using the startId, so that we don't stop
             // the service in the middle of handling another job
 //            stopSelf(msg.arg1);
@@ -83,7 +83,11 @@ public class FileReceiverService extends Service{
 
         // For each start request, send a message to start a job and deliver the
         // start ID so we know which request we're stopping when we finish the job
+        String rootDir = intent.getExtras().getString(FileReceiver.EXTENDED_DATA_ROOTDIR);
+
         Message msg = mServiceHandler.obtainMessage();
+        msg.obj = rootDir;
+
         mServiceHandler.sendMessage(msg);
 
         // If we get killed, after returning from here, restart

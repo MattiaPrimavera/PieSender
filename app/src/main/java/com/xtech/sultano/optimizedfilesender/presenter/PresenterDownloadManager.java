@@ -80,11 +80,11 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
                         filename = intent.getExtras().getString(FileReceiver.EXTENDED_DATA_FILENAME);
                         long receivedData = intent.getExtras().getLong(FileReceiver.EXTENDED_DATA_RECEIVED);
                         int percentage = Integer.parseInt(intent.getExtras().getString(FileReceiver.EXTENDED_DATA_PERCENTAGE));
-                        Log.d("TEST10", "Receiving progress bar notification");
+                        Log.d("LOG20", "Receiving progress bar notification");
                         updateModel(filename, percentage, receivedData);
                         break;
                     case FileReceiver.INTENT_ACTION_VALUE_ADD: // New upload notification
-                        Log.d("TEST10", "Receiving new Download notification");
+                        Log.d("LOG20", "Receiving new Download notification");
                         filename = intent.getExtras().getString(FileReceiver.EXTENDED_DATA_FILENAME);
                         filesize = intent.getExtras().getLong(FileReceiver.EXTENDED_DATA_TOTAL_SIZE);
                         addDownload(filename, filesize);
@@ -128,8 +128,8 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         }
     }
 
-    public synchronized void updateModel(String filePath, int progressStatus, long sentData){
-        mModel.updateProgress(filePath, progressStatus, sentData);
+    public synchronized void updateModel(String filePath, int progressStatus, long receivedData){
+        mModel.updateProgress(filePath, progressStatus, receivedData);
         this.updateUI();
         //Log.d("LOGM", "updating Model --> PRESENTER DOWNLOAD MANAGER == " + Integer.toString(progressStatus));
     }
@@ -138,12 +138,12 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         if(mView.isAdded()) {
             long currentTime = System.currentTimeMillis();
             long difference = currentTime - this.lastRefreshTime;
-            Log.d("TEST12", "difference: " + Long.toString(difference) + " --> currentTime : " + Long.toString(currentTime) + " --> " + Long.toString(this.lastRefreshTime));
+            Log.d("LOG20", "difference: " + Long.toString(difference) + " --> currentTime : " + Long.toString(currentTime) + " --> " + Long.toString(this.lastRefreshTime));
 
             if(difference < REFRESH_RATE){
                 // Limiting refresh rates
                 this.economy++;
-                Log.d("TEST13", "economy: " + Integer.toString(this.economy));
+                Log.d("LOG20", "economy: " + Integer.toString(this.economy));
                 return;
             }
             else{
