@@ -186,7 +186,7 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
     public void startDiscoveryServerService(){
         Log.d("LOG20", "starting discovery service");
-        Intent intent = new Intent(mContext, DiscoveryService.class);
+        Intent intent = new Intent(mContext, com.xtech.sultano.optimizedfilesender.server.DiscoveryService.class);
         mContext.startService(intent);
     }
 
