@@ -99,9 +99,9 @@ public class FileReceiver implements Runnable {
                         if(percentage > oldPercentage){
                             Log.d("LOG20", "updating model --> percentage : " + Integer.toString(percentage));
                             if(filePath != null)
-                                this.updateModel(filePath, percentage, total_len_read);
+                                this.updateModel(filePath, percentage, total_len_read, len);
                             else
-                                this.updateModel(mRootDir + file_name, percentage, total_len_read);                                
+                                this.updateModel(mRootDir + file_name, percentage, total_len_read, len);
                         }
                         oldPercentage = percentage;
 
@@ -122,12 +122,13 @@ public class FileReceiver implements Runnable {
         }
     }
 
-    public void updateModel(String filepath, int percentage, long receivedData){
+    public void updateModel(String filepath, int percentage, long receivedData, long totalSize){
         Intent localIntent = new Intent(INTENT_UPDATE_UI)
                 // Puts the status into the Intent
                 .putExtra(INTENT_ACTION, INTENT_ACTION_VALUE_UPDATE)
                 .putExtra(EXTENDED_DATA_FILENAME, filepath)
                 .putExtra(EXTENDED_DATA_RECEIVED, receivedData)
+                .putExtra(EXTENDED_DATA_TOTAL_SIZE, totalSize)
                 .putExtra(EXTENDED_DATA_PERCENTAGE, Integer.toString(percentage));
         // Broadcasts the Intent to receivers in this app.
         Log.d("LOG20", "BROADCAST : " + filepath);

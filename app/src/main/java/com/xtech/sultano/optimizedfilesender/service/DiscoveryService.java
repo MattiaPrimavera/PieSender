@@ -23,15 +23,16 @@ public class DiscoveryService extends Service{
     private ServiceHandler mServiceHandler;
     private LocalBroadcastManager mLocalBroadCastManager;
     public static final String INTENT_NAME = "discovery-response";
+    public static final String EXTENDED_SERVER_NAME = "com.xtech.optimizedfilesender.SERVER_NAME";
     public static final String EXTENDED_DISCOVERY_RESULT = "com.xtech.optimizedfilesender.DISCOVERY_RESULT";
 
     public DiscoveryService(){
         Log.d("LOG19", "DiscoveryService() constructor");
     }
 
-    public void broadcastDiscoveryResponse(){
+    public void broadcastDiscoveryResponse(String serverName){
         Log.d("LOG19", "broadcastDiscoveryResponse()");
-        DiscoveryClient c = new DiscoveryClient();
+        DiscoveryClient c = new DiscoveryClient(serverName);
         HashMap<String, InetAddress> discoveryResult = c.findServer();
 
         Log.d("LOG19", "after findServer");
@@ -54,7 +55,7 @@ public class DiscoveryService extends Service{
             // Normally we would do some work here, like download a file.
             // For our sample, we just sleep for 5 seconds.
             Log.d("LOG19", "handleMessage");
-            broadcastDiscoveryResponse();
+            broadcastDiscoveryResponse((String)msg.obj);
             // Stop the service using the startId, so that we don't stop
             // the service in the middle of handling another job
 //            stopSelf(msg.arg1);
@@ -83,9 +84,13 @@ public class DiscoveryService extends Service{
         Toast.makeText(this, "DiscoveryService started ...", Toast.LENGTH_SHORT).show();
         Log.d("LOG19", "DiscoveryService onStartCommand");
 
+
+        String serverName = intent.getExtras().getString(EXTENDED_SERVER_NAME);
         // For each start request, send a message to start a job and deliver the
         // start ID so we know which request we're stopping when we finish the job
         Message msg = mServiceHandler.obtainMessage();
+        msg.obj = serverName;
+
         mServiceHandler.sendMessage(msg);
 
         // If we get killed, after returning from here, restart

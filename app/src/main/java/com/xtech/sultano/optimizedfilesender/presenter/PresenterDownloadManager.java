@@ -79,9 +79,10 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
                     case FileReceiver.INTENT_ACTION_VALUE_UPDATE: // Transfer progress update notification
                         filename = intent.getExtras().getString(FileReceiver.EXTENDED_DATA_FILENAME);
                         long receivedData = intent.getExtras().getLong(FileReceiver.EXTENDED_DATA_RECEIVED);
+                        long totalSize = intent.getExtras().getLong(FileReceiver.EXTENDED_DATA_TOTAL_SIZE);
                         int percentage = Integer.parseInt(intent.getExtras().getString(FileReceiver.EXTENDED_DATA_PERCENTAGE));
                         Log.d("LOG20", "Receiving progress bar notification");
-                        updateModel(filename, percentage, receivedData);
+                        updateModel(filename, percentage, receivedData, totalSize);
                         break;
                     case FileReceiver.INTENT_ACTION_VALUE_ADD: // New upload notification
                         Log.d("LOG20", "Receiving new Download notification");
@@ -128,8 +129,8 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         }
     }
 
-    public synchronized void updateModel(String filePath, int progressStatus, long receivedData){
-        mModel.updateProgress(filePath, progressStatus, receivedData);
+    public synchronized void updateModel(String filePath, int progressStatus, long receivedData, long totalSize){
+        mModel.updateProgress(filePath, progressStatus, receivedData, totalSize);
         this.updateUI();
         //Log.d("LOGM", "updating Model --> PRESENTER DOWNLOAD MANAGER == " + Integer.toString(progressStatus));
     }

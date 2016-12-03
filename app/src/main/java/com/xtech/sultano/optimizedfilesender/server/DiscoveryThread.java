@@ -26,7 +26,7 @@ public class DiscoveryThread implements Runnable {
     }
 
     public DiscoveryThread(){
-        this.serverName = "android";
+        this.serverName = "MattiaServerTest3";
     }
 
     public DatagramPacket receiveMessage(DatagramSocket socket) throws IOException{

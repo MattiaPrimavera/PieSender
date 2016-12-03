@@ -19,6 +19,14 @@ public class Download implements Comparable<Download>{
         this.file = null;
     }
 
+    public Download(String filename, int percentage, long sentData, long totalSize){
+        this.filename = filename;
+        this.dimension = totalSize;
+        this.isDir = false;
+        this.progress = percentage;
+        this.sentData = sentData;
+    }
+
     public Download(File file, long dimension, boolean isDir, int progress){
         this.file = file;
         this.dimension = dimension;

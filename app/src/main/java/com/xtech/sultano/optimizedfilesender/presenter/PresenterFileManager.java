@@ -55,11 +55,13 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
     private HashMap<String, InetAddress> mDiscoveryResponse;
     private boolean mReceiverSet;
     private InetAddress mDestAddr;
+    private String mServerName;
     private FileLoader mFileLoader; /*Loads the list of files from the model in
     a background thread.*/
 
     public PresenterFileManager(UiView mView, Model mModel, Context context, LoaderManager mLoaderManager) {
         this.mView = mView;
+        this.mServerName = "MattiaServerTest3";
         this.mReceiverSet = false;
         this.mLoaderManager = mLoaderManager;
         this.mModel = mModel;
@@ -164,8 +166,8 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
         // Check if network is available
         ConnectivityManager connectivityManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+//        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+//                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
             // We're connected
 
             // Check if receiver address is set
@@ -173,15 +175,16 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
                 Log.d("LOG19", "starting intent to set receiver ... ");
                 this.receiveDiscoveryResponse();
                 intent = new Intent(mContext, DiscoveryService.class);
+                intent.putExtra(DiscoveryService.EXTENDED_SERVER_NAME, mServerName);
                 mContext.startService(intent);
             }else{
                 this.startSendFileService(filePath);
             }
-        }
+/*        }
         else { // Make a toast to warn the user!
             // We're NOT connected
             this.makeToast("No Network connections available :(");
-        }
+        }*/
     }
 
     public void startDiscoveryServerService(){

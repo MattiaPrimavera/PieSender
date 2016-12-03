@@ -17,8 +17,10 @@ public class DiscoveryClient{
     public static final String BRDCAST_ADDR = "255.255.255.255";
     public static final int BRDCAST_PORT = 8888;
     private String clientName;
+    private String mServerName;
 
-    public DiscoveryClient(){
+    public DiscoveryClient(String serverName){
+        this.mServerName = serverName;
         this.clientName = "testClient1";
     }
 
@@ -68,6 +70,7 @@ public class DiscoveryClient{
     public DatagramPacket waitForDiscoveryResponse(DatagramSocket c) throws IOException{
         //Wait for a response
         byte[] recvBuf = new byte[15000];
+
         DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
         c.receive(receivePacket);
 
@@ -85,19 +88,30 @@ public class DiscoveryClient{
             byte[] sendData = this.makeDiscoveryRequest();
             this.broadcastDiscoveryRequest(c, sendData);
 
-            DatagramPacket discoveryResponse = this.waitForDiscoveryResponse(c);
+            int found = 0;
+            while(true){
+                DatagramPacket discoveryResponse = this.waitForDiscoveryResponse(c);
 
-            //Check if the message is correct
-            String message = new String(discoveryResponse.getData()).trim();
+                //Check if the message is correct
+                String message = new String(discoveryResponse.getData()).trim();
 
-            if (message.startsWith(DISCOVERY_RESPONSE_PREFIX)) {
-                //DO SOMETHING WITH THE SERVER'S IP (for example, store it in your controller)
+                if (message.startsWith(DISCOVERY_RESPONSE_PREFIX)) {
+                    //DO SOMETHING WITH THE SERVER'S IP (for example, store it in your controller)
 
-                InetAddress serverAddr = discoveryResponse.getAddress();
-                Log.d("LOG19", "findServer --> serverAddr : " + serverAddr.toString());
-                String serverName = message.substring(DISCOVERY_RESPONSE_PREFIX.length(), message.length());
-                Log.d("LOG19", "findServer --> serverName: " + serverName);
-                discoveryResult.put(serverName, serverAddr);
+                    InetAddress serverAddr = discoveryResponse.getAddress();
+                    Log.d("LOG19", "findServer --> serverAddr : " + serverAddr.toString());
+                    String serverName = message.substring(DISCOVERY_RESPONSE_PREFIX.length(), message.length());
+                    Log.d("LOG19", "findServer --> serverName: " + serverName);
+                    if(serverName.equals(mServerName)){
+                        continue;
+                    }
+                    found++;
+                    discoveryResult.put(serverName, serverAddr);
+
+                    if(found == 1){
+                        break;
+                    }
+                }
             }
 
             //Close the port!

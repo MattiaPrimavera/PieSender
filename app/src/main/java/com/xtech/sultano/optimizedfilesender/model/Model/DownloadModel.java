@@ -71,7 +71,7 @@ public class DownloadModel {
         return this.mDownloadList.get(index);
     }
 
-    public synchronized boolean updateProgress(String filename, int percentage, long sentData){
+    public synchronized boolean updateProgress(String filename, int percentage, long sentData, long totalSize){
         Log.d("LOG20", "updating Model : " + Integer.toString(percentage) + " --> " + filename);
         boolean updated = false;
 /*        for(int i=0; i < this.mDownloadList.size(); i++){
@@ -83,6 +83,8 @@ public class DownloadModel {
             d.setProgress(percentage);
             d.setSentData(sentData);
             updated = true;
+        }else{
+            this.addDownload(new Download(filename, percentage, sentData, totalSize));
         }
         return updated;
     }
