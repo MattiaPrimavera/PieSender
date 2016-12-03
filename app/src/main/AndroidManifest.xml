@@ -35,6 +35,8 @@
         </activity>
         <service android:name=".service.FileSenderService"/>
         <service android:name=".service.DiscoveryService"/>
+        <service android:name=".server.DiscoveryService"/>
+        <service android:name=".server.FileReceiverService"/>
     </application>
 
 </manifest>
