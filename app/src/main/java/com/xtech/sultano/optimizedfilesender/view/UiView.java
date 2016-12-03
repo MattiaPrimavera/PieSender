@@ -65,7 +65,7 @@ public class UiView extends ListFragment {
     }
 
     public void onBackPressed(){
-        presenterFileManager.homePressed();
+        presenterFileManager.onBackPressed();
     }
 
     //When we intercept a click, call through to the appropriate method in the presenterFileManager.
@@ -94,7 +94,7 @@ public class UiView extends ListFragment {
 
         switch(id) {
             case android.R.id.home:
-                presenterFileManager.homePressed();
+                presenterFileManager.onBackPressed();
                 break;
             case R.id.action_send_all_files:
                 presenterFileManager.sendAll();
