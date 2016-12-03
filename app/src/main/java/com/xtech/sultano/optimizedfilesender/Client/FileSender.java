@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class FileSender {
-    public static final String INTENT_NAME = "download-ui-update";
+    public static final String INTENT_NAME = "upload-ui-update";
     public static final String INTENT_ACTION = "com.xtech.optimizedfilesender.INTENT_ACTION";
     public static final String INTENT_ACTION_VALUE = "statusUpdate";
     public static final String EXTENDED_DATA_FILEPATH = "com.xtech.optimizedfilesender.FILEPATH";

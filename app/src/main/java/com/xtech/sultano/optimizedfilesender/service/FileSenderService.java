@@ -14,24 +14,24 @@ import android.widget.Toast;
 import com.xtech.sultano.optimizedfilesender.Client.FileSenderRunnable;
 import com.xtech.sultano.optimizedfilesender.Client.ThreadQueue;
 import com.xtech.sultano.optimizedfilesender.observer.Observer;
-import com.xtech.sultano.optimizedfilesender.presenter.PresenterDownloadManager;
+import com.xtech.sultano.optimizedfilesender.presenter.PresenterUploadManager;
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterFileManager;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
 public class FileSenderService extends Service implements Observer{
-    private PresenterDownloadManager mPresenterDownloadManager;
+    private PresenterUploadManager mPresenterUploadManager;
     private PresenterFileManager mPresenterFileManager;
     private ThreadQueue mThreadQueue;
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
     private LocalBroadcastManager mLocalBroadCastManager;
-    public static final String INTENT_NAME = "download-ui-update";
+    public static final String INTENT_NAME = "upload-ui-update";
     public static final String FILE_PATH_EXTRA = "filepath";
     public static final String HOST_EXTRA = "com.xtech.optimizedfilesender.INTENT_ACTION";
     public static final String INTENT_ACTION =
             "com.xtech.optimizedfilesender.INTENT_ACTION";
-    public static final String INTENT_ACTION_VALUE = "addDownload";
+    public static final String INTENT_ACTION_VALUE = "addUpload";
     public static final String EXTENDED_DATA_FILEPATH =
             "ccom.xtech.optimizedfilesender.FILEPATH";
 
@@ -44,7 +44,7 @@ public class FileSenderService extends Service implements Observer{
         fileSenderRunnable.register(this);
         this.mThreadQueue.enqueue(new Thread(fileSenderRunnable));
 
-        // Notifying PresenterDownloadManager that there's a new Download to show
+        // Notifying PresenterUploadManager that there's a new Upload to show
         Intent localIntent = new Intent(INTENT_NAME)
                 .putExtra(INTENT_ACTION, INTENT_ACTION_VALUE)
                 .putExtra(EXTENDED_DATA_FILEPATH, filePath);

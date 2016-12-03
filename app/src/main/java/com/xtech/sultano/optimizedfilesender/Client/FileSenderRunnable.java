@@ -24,7 +24,7 @@ public class FileSenderRunnable implements Runnable, Subject {
 
     public void run(){
         try {
-            //Informing PresenterDownloadManager of new download
+            //Informing PresenterUploadManager of new download
             File fileToSend = new File(this.filePath);
             Log.d("TEST10", "fileSenderrunnable sending a new file");
 
