@@ -61,24 +61,28 @@ public class FileReceiver implements Runnable {
                         continue;
                     else if(file_name.contains("/")){ // it means it's a filePath, we may need to create some directories
                         Log.d("LOG19", "Pathed filename: " + file_name);
-                        filePath = file_name.substring(1, file_name.length());
+                        if(file_name.startsWith(("/"))){
+                            filePath = file_name.substring(1, file_name.length());
+                        }else{
+                            filePath = file_name;
+                        }
+                        filePath = mRootDir + filePath;
                         Log.d("LOG19", "filePath modified: " + filePath);
                         file = new File(filePath);
                         file.getParentFile().mkdirs();
                         file.createNewFile();
                     }else{
+                        filePath = mRootDir + file_name;
                         Log.d("LOG19", "Unpathed filename: " + file_name);
-                        file = new File(mRootDir + file_name);
+                        file = new File(filePath);
                         file.createNewFile();
                     }
 
                     // Having a ByteStream.toFile here
                     long len = ByteStream.toLong(in);
 
-                    if(filePath != null)
-                        this.addUpload(filePath, len);
-                    else
-                        this.addUpload(mRootDir + file_name, len);
+                    // Adding new Upload
+                    this.addUpload(filePath, len);
 
                     int buf_size = 1024;
                     FileOutputStream fos = new FileOutputStream(file);
@@ -97,11 +101,7 @@ public class FileReceiver implements Runnable {
                         // Updating Download Model
                         int percentage = (int) ((total_len_read * 100) / len);
                         if(percentage > oldPercentage){
-                            Log.d("LOG20", "updating model --> percentage : " + Integer.toString(percentage));
-                            if(filePath != null)
-                                this.updateModel(filePath, percentage, total_len_read, len);
-                            else
-                                this.updateModel(mRootDir + file_name, percentage, total_len_read, len);
+                            this.updateModel(filePath, percentage, total_len_read, len);
                         }
                         oldPercentage = percentage;
 
@@ -109,6 +109,9 @@ public class FileReceiver implements Runnable {
                             return;
                         }
                     }
+
+                    in.close();
+                    fos.close();
 
                 }catch(FileNotFoundException e){
                     e.printStackTrace();
