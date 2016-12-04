@@ -150,6 +150,13 @@ public class FileSender {
                 // Sending FILE_NUMBER
                 ByteStream.toStream(os, cnt_files);
 
+                // Sending FILE_TYPE
+                ByteStream.toStream(os, "d");
+                
+                ByteStream.toStream(os, directory.getName());
+                ByteStream.toStream(os, directorySize);
+
+
                 // Sending the filePath if needing to recreate same tree structure on destination machine
                 boolean tree = true; // I temporarily consider tree = true here
                 if(tree){
