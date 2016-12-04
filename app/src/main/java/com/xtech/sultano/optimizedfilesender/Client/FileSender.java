@@ -1,23 +1,16 @@
 package com.xtech.sultano.optimizedfilesender.Client;
 
 import android.content.Intent;
-import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.View;
-
 import com.xtech.sultano.optimizedfilesender.utils.FileUtils;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.*;
 import java.io.OutputStream;
 import java.io.File;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class FileSender {
@@ -59,22 +52,7 @@ public class FileSender {
             // Sending file length
             ByteStream.toStream(os, fileSize);
 
-            byte b[] = new byte[1024];
-            InputStream is = new FileInputStream(file);
-            int numRead;
-            long total = 0;
-            int oldPercentage = 0;
-            while ( ( numRead=is.read(b)) > 0) {
-                total += numRead;
-                os.write(b, 0, numRead);
-
-                int percentage = (int) ((total * 100) / file.length());
-                if(percentage > oldPercentage){
-                    this.updateModel(filePath, percentage, total);
-                }
-                oldPercentage = percentage;
-            }
-            Log.d("TEST:", "total: " + Long.toString(total) );
+            this.sendData(os, file, filePath, fileSize);
             os.flush();
             os.close();
             return fileSize;
@@ -94,17 +72,7 @@ public class FileSender {
             os = socket.getOutputStream();
         } catch (java.net.ConnectException enet){
             enet.printStackTrace();
-/*            // Start lengthy operation in a background thread
-            new Thread(new Runnable() {
-                public void run() {
-                    // Update the progress bar
-                    mHandler.post(new Runnable() {
-                        public void run() {
-                            mPresenterFileManager.makeToast("Connection refused from Server ... :(");
-                        }
-                    });
-                }
-            }).start();*/
+            /* TO-DO: Notify there was an error while establishing connection */
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -149,35 +117,33 @@ public class FileSender {
     }
 
     public void sendDirectory(String directoryPath){
+        long totalSent = 0;
+        long directorySize = 0;
+        OutputStream os = null;
         File directory = new File(directoryPath);
         List<File> allFiles = FileUtils.getAllFilesRecursively(directory);
+        int cnt_files = allFiles.size();
 
         // Returning on Empty file list
         if(allFiles.size() == 0)
             return;
 
-        OutputStream os = null;
-        try {
-            int cnt_files = allFiles.size();
-            long totalSize = 0;
-
-            // Calculating total file size
-            Log.d("LOG18", "TOTAL File Number: " + Integer.toString(cnt_files));
+        try { // Calculating directory size
             for(int i = 0; i < cnt_files; i++){
-                //Log.d("TEST: ", Integer.toString(i) + " --> " + allFiles.get(i).getName());
-                totalSize += allFiles.get(i).length();
+                directorySize += allFiles.get(i).length();
             }
-            Log.d("LOG16", "total size found : " + Long.toString(totalSize));
 
-            long totalSent = 0;
-            // Looping through all files contained and sending them
+            if(directorySize == 0)
+                this.updateModel(directoryPath, 100, totalSent);
+
+            // Looping over Directory files to send them all
             for (int cur_file = 0; cur_file < cnt_files; cur_file++) {
                 os = this.establishConnection(host, port);
 
                 File file = allFiles.get(cur_file);
                 long fileSize = file.length();
 
-                // How many files?
+                // Sending FILE_NUMBER
                 ByteStream.toStream(os, cnt_files);
 
                 // Sending the filePath if needing to recreate same tree structure on destination machine
@@ -191,32 +157,61 @@ public class FileSender {
                 // Sending file length
                 ByteStream.toStream(os, fileSize);
 
-                byte b[] = new byte[1024];
-                InputStream is = new FileInputStream(file);
-                int numRead;
-                int oldPercentage = 0;
-                while ( ( numRead=is.read(b)) > 0) {
-                    totalSent += numRead;
-                    os.write(b, 0, numRead);
-
-                    int percentage = (int) ((totalSent * 100) / totalSize);
-                    //Log.d("LOG16", "current Percentage : " + Integer.toString(percentage));
-                    Log.d("LOG16", "total Sent : " + Long.toString(totalSent));
-                    if(percentage > oldPercentage){
-                        this.updateModel(directoryPath, percentage, totalSent);
-                        Log.d("LOG16", "sendDirectory updating the model ..." + Integer.toString(percentage));
-                    }
-                    oldPercentage = percentage;
-                }
-                Log.d("LOG16", "sending file number: " + Integer.toString(cur_file));
-
-                os.flush();
-                os.close();
+                // Sending file Data
+                Log.d("TEST24", Long.toString(totalSent));
+                totalSent += this.sendDataDirectory(os, file, directoryPath, directorySize, totalSent);
             }
+            os.flush();
+            os.close();
         }
         catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public long sendDataDirectory(OutputStream os, File file, String directoryPath, long directorySize, long totalSent) throws IOException{
+        byte b[] = new byte[1024];
+        int numRead;
+        long total = 0;
+        int oldPercentage = 0;
+
+        InputStream is = new FileInputStream(file);
+
+        while ( (numRead = is.read(b)) > 0) {
+            total += numRead;
+            os.write(b, 0, numRead);
+
+            int percentage = (int) (((total + totalSent) * 100) / directorySize);
+            if(percentage > oldPercentage){
+                this.updateModel(directoryPath, percentage, total + totalSent);
+            }
+            oldPercentage = percentage;
+        }
+        is.close();
+        Log.d("TEST:", "total: " + Long.toString(total) );
+        return total;
+    }
+
+    public long sendData(OutputStream os, File file, String filePath, long fileSize) throws IOException{
+        byte b[] = new byte[1024];
+        int numRead;
+        long total = 0;
+        int oldPercentage = 0;
+
+        InputStream is = new FileInputStream(file);
+
+        while ( (numRead = is.read(b)) > 0) {
+            total += numRead;
+            os.write(b, 0, numRead);
+
+            int percentage = (int) ((total * 100) / fileSize);
+            if(percentage > oldPercentage){
+                this.updateModel(filePath, percentage, total);
+            }
+            oldPercentage = percentage;
+        }
+        Log.d("TEST:", "total: " + Long.toString(total) );
+        return total;
     }
 
     public void updateModel(String filepath, int percentage, long sentData){
