@@ -8,7 +8,6 @@ import java.net.Socket;
 import java.net.ServerSocket;
 
 public class FileReceiver implements Runnable {
-
   private static final int port = 8000;
 
   private Socket socket;
@@ -32,13 +31,26 @@ public class FileReceiver implements Runnable {
   public void run() {
     try {
       InputStream in = socket.getInputStream();
-  
+      String dirName = null;
+      long dirSize = 0;
+
       int nof_files = ByteStream.toInt(in);
       System.out.println("receiving: " + nof_files + " files ...");
 
+      String fileType = ByteStream.toString(in);
+      System.out.println("fileType: " + fileType);      
+
+      if(fileType.equals("d")){
+        dirName = ByteStream.toString(in);
+        System.out.println("dirName: " + dirName);
+
+        dirSize = ByteStream.toLong(in);
+        System.out.println("dirSize: " + dirSize);
+      }
+
+      String filePath = null;
       for (int cur_file=0;cur_file < nof_files; cur_file++) {
         String file_name = ByteStream.toString(in);
-//        System.out.println("writing file: " + file_name);
 
         try{
           if(file_name == null || file_name.length() == 0 || file_name == "")
@@ -46,7 +58,17 @@ public class FileReceiver implements Runnable {
             //System.out.println("Filename vuoto!!!");
           else if(file_name.contains("/")){ // it means it's a filePath, we may need to create some directories
             System.out.println("Pathed filename: " + file_name);
-            String filePath = file_name.substring(1, file_name.length());
+            if(file_name.startsWith("/")){
+              filePath = file_name.substring(1, file_name.length());
+            }else{
+              filePath = file_name;
+            }
+
+            if(fileType.equals("d")){
+              int index = filePath.indexOf(dirName);
+              filePath = filePath.substring(index, filePath.length());
+              System.out.println("filePath DIR-CASE: " + filePath);
+            }
             System.out.println("filePath modified: " + filePath);
 
             File file = new File(filePath);
@@ -68,4 +90,16 @@ public class FileReceiver implements Runnable {
       ex.printStackTrace(System.out);
     }
   }
+
+/*  public void updateModel(String filepath, int percentage, long sentData){
+    Intent localIntent = new Intent(INTENT_NAME)
+        // Puts the status into the Intent
+        .putExtra(INTENT_ACTION, INTENT_ACTION_VALUE)
+        .putExtra(EXTENDED_DATA_FILENAME, filepath)
+        .putExtra(EXTENDED_DATA_RECEIVED, sentData)
+        .putExtra(EXTENDED_DATA_PERCENTAGE, Integer.toString(percentage));
+    // Broadcasts the Intent to receivers in this app.
+    Log.d("TEST10", "sending broadcast message");
+    mLocalBroadcastManager.sendBroadcast(localIntent);
+  }*/
 }

@@ -20,6 +20,7 @@ public class FileSender {
     public static final String EXTENDED_DATA_FILEPATH = "com.xtech.optimizedfilesender.FILEPATH";
     public static final String EXTENDED_DATA_PERCENTAGE = "com.xtech.optimizedfilesender.PERCENTAGE";
     public static final String EXTENDED_DATA_SENT = "com.xtech.optimizedfilesender.SENT_DATA";
+    public static final String TYPE_FILE = "f";
 
     // host and port of receiver
     private int port;
@@ -39,8 +40,11 @@ public class FileSender {
             File file = new File(filePath);
             long fileSize = file.length();
 
-            // How many files?
+            // Sending FILE_NUMBER
             ByteStream.toStream(os, cnt_files);
+
+            // Sending FILE_TYPE
+            ByteStream.toStream(os, TYPE_FILE);
 
             // Sending the filePath if needing to recreate same tree structure on destination machine
             if(tree){

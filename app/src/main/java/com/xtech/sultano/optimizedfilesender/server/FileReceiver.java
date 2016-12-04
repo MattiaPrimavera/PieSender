@@ -46,9 +46,22 @@ public class FileReceiver implements Runnable {
     public void run() {
         try {
             InputStream in = socket.getInputStream();
+            String dirName = null; long dirSize;
 
+            // Receiving FILE_NUMBER
             int nof_files = ByteStream.toInt(in);
             Log.d("LOG19", "receiving: " + nof_files + " files ...");
+
+            String fileType = ByteStream.toString(in);
+            Log.d("LOG19", "fileType: " + fileType);
+
+            if(fileType.equals("d")){
+                dirName = ByteStream.toString(in);
+                Log.d("LOG19", "dirName: " + dirName);
+
+                dirSize = ByteStream.toLong(in);
+                Log.d("LOG19", "dirSize: " + dirSize);
+            }
 
             for (int cur_file=0;cur_file < nof_files; cur_file++) {
                 String file_name = ByteStream.toString(in);
@@ -56,6 +69,7 @@ public class FileReceiver implements Runnable {
                 try{
                     File file;
                     String filePath = null;
+                    String updatePath = null;
 
                     if(file_name == null || file_name.length() == 0 || file_name == "")
                         continue;
@@ -66,6 +80,14 @@ public class FileReceiver implements Runnable {
                         }else{
                             filePath = file_name;
                         }
+
+                        if(fileType.equals("d")){
+                            int index = filePath.indexOf(dirName);
+                            filePath = filePath.substring(index, filePath.length());
+                            Log.d("LOG19", "filePath DIR-CASE: " + filePath);
+                        }
+
+                        updatePath = filePath;
                         filePath = mRootDir + filePath;
                         Log.d("LOG19", "filePath modified: " + filePath);
                         file = new File(filePath);
@@ -73,6 +95,7 @@ public class FileReceiver implements Runnable {
                         file.createNewFile();
                     }else{
                         filePath = mRootDir + file_name;
+                        updatePath = file_name;
                         Log.d("LOG19", "Unpathed filename: " + file_name);
                         file = new File(filePath);
                         file.createNewFile();
@@ -82,7 +105,7 @@ public class FileReceiver implements Runnable {
                     long len = ByteStream.toLong(in);
 
                     // Adding new Upload
-                    this.addUpload(filePath, len);
+                    this.addUpload(updatePath, len);
 
                     int buf_size = 1024;
                     FileOutputStream fos = new FileOutputStream(file);
@@ -101,7 +124,7 @@ public class FileReceiver implements Runnable {
                         // Updating Download Model
                         int percentage = (int) ((total_len_read * 100) / len);
                         if(percentage > oldPercentage){
-                            this.updateModel(filePath, percentage, total_len_read, len);
+                            this.updateModel(updatePath, percentage, total_len_read, len);
                         }
                         oldPercentage = percentage;
 
