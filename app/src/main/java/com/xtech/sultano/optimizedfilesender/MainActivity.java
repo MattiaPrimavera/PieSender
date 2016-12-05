@@ -1,12 +1,12 @@
 package com.xtech.sultano.optimizedfilesender;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -26,6 +26,8 @@ import com.xtech.sultano.optimizedfilesender.view.UiView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     private LoaderManager mLoaderManager;
+    private Fragment currentFragment;
+    private boolean fileExplorerHidden;
     private UiView mView;
     private UploadView mUploadView;
     private DownloadView mDownloadView;
@@ -49,7 +51,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mView = UiView.newInstance();
         mUploadView = UploadView.newInstance();
         mDownloadView = DownloadView.newInstance();
-        
+        currentFragment = null;
+
         mLoaderManager = getSupportLoaderManager();
         mPresenterFactory = new PresenterFactory(mView, mUploadView, mDownloadView, this, mLoaderManager);
 
@@ -69,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        fileExplorerHidden = false;
 
         // Setting up Toolbar + NavigationBar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -90,8 +94,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if(mView.isAdded())
+            if(mView.isAdded() && currentFragment == null){
+                Log.d("LOG29", "mView is added");
                 mView.onBackPressed();
+            }
+            else{
+                int count = getFragmentManager().getBackStackEntryCount();
+                if (count == 0) {
+                    Log.d("LOG29", "count is 0");
+                    super.onBackPressed();
+                    //additional code
+                } else {
+                    Log.d("LOG29", "hiding last fragment before popBackStack()");
+                    //hideLastFragment();
+                    //currentFragment = null;
+                    getSupportFragmentManager().popBackStack();
+                }
+            }
         }
     }
 
@@ -144,17 +163,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    public void replaceFragment(int toReplace, Fragment withFragment){
-        //gets Fragment Manager
-        FragmentManager fragmentManager = getFragmentManager();
-
+    public void hideLastFragment(){
+        FragmentManager fragmentManager = getSupportFragmentManager();
         //starts the transaction
         FragmentTransaction ft = fragmentManager.beginTransaction();
-        Fragment toHide = fragmentManager.findFragmentById(toReplace);
-//        ft.hide(toHide);
-        ft.replace(toReplace, withFragment);
-        ft.show(withFragment);
         ft.addToBackStack(null);
+        ft.hide(currentFragment);
+        ft.commit();
+    }
+
+    public void replaceFragment(int toReplace, Fragment withFragment){
+        //gets Fragment Manager
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        currentFragment = withFragment;
+        //starts the transaction
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        ft.replace(toReplace, withFragment);
+        ft.addToBackStack(null);
+        ft.show(withFragment);
         ft.commit();
     }
 }
