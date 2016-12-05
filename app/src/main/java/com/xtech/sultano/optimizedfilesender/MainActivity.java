@@ -1,6 +1,9 @@
 package com.xtech.sultano.optimizedfilesender;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -19,10 +22,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterFactory;
+import com.xtech.sultano.optimizedfilesender.server.FileReceiver;
+import com.xtech.sultano.optimizedfilesender.server.FileReceiverService;
 import com.xtech.sultano.optimizedfilesender.view.DownloadView;
 import com.xtech.sultano.optimizedfilesender.view.SettingsView;
 import com.xtech.sultano.optimizedfilesender.view.UploadView;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     private LoaderManager mLoaderManager;
@@ -49,8 +56,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // UI Fragments
         mView = UiView.newInstance();
+        mView.setRetainInstance(true);
         mUploadView = UploadView.newInstance();
+        mUploadView.setRetainInstance(true);
         mDownloadView = DownloadView.newInstance();
+        mDownloadView.setRetainInstance(true);
         currentFragment = null;
 
         mLoaderManager = getSupportLoaderManager();
@@ -66,6 +76,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mSectionsPagerAdapter.addPage(mUploadView, "TWO");
         mSectionsPagerAdapter.addPage(mDownloadView, "THREE");
         mViewPager.setAdapter(mSectionsPagerAdapter);
+    }
+
+    public void startDiscoveryServerService(){
+        Context mContext = this.getApplicationContext();
+        Log.d("LOG20", "starting discovery service");
+        Intent intent = new Intent(mContext, com.xtech.sultano.optimizedfilesender.server.DiscoveryService.class);
+        mContext.startService(intent);
+    }
+
+    public void startReceiveFileService(){
+        Context mContext = this.getApplicationContext();
+        Log.d("LOG20", "starting file receive service");
+        File dir = Environment.getExternalStorageDirectory();
+        for (File tmp : dir.listFiles()){
+            Log.d("LOG21", tmp.getAbsolutePath());
+        }
+        Log.d("LOG21", "rootDir special " + mContext.getFilesDir());
+        Log.d("LOG21", "rootDir special path" + mContext.getFilesDir().getAbsolutePath());
+
+        Intent intent = new Intent(mContext, FileReceiverService.class);
+        intent.putExtra(FileReceiver.EXTENDED_DATA_ROOTDIR, dir.getAbsolutePath());
+        mContext.startService(intent);
+    }
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -161,6 +201,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(isExternalStorageWritable()){
+            this.startReceiveFileService();
+            this.startDiscoveryServerService();
+            Log.d("LOG21", "storage writable");
+        }else{
+            // ERROR!
+            Log.d("LOG21", "storage NON writable");
+        }
     }
 
     public void hideLastFragment(){

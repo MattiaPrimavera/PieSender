@@ -101,17 +101,6 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         // Starting Servers: Discovery + Receiver
         Log.d("LOG20", "starting server threads");
 
-
-        if(isExternalStorageWritable()){
-            this.startReceiveFileService();
-            this.startDiscoveryServerService();
-            Log.d("LOG21", "storage writable");
-        }else{
-            // ERROR!
-            Log.d("LOG21", "storage NON writable");
-        }
-
-
         //Grab our first list of results from our loader.  onFinishLoad() will call updataAdapter().
         //mFileLoader = new FileLoader(mContext);
     }
@@ -185,26 +174,6 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
             // We're NOT connected
             this.makeToast("No Network connections available :(");
         }*/
-    }
-
-    public void startDiscoveryServerService(){
-        Log.d("LOG20", "starting discovery service");
-        Intent intent = new Intent(mContext, com.xtech.sultano.optimizedfilesender.server.DiscoveryService.class);
-        mContext.startService(intent);
-    }
-
-    public void startReceiveFileService(){
-        Log.d("LOG20", "starting file receive service");
-        File dir = Environment.getExternalStorageDirectory();
-        for (File tmp : dir.listFiles()){
-            Log.d("LOG21", tmp.getAbsolutePath());
-        }
-        Log.d("LOG21", "rootDir special " + mContext.getFilesDir());
-        Log.d("LOG21", "rootDir special path" + mContext.getFilesDir().getAbsolutePath());
-
-        Intent intent = new Intent(mContext, FileReceiverService.class);
-        intent.putExtra(FileReceiver.EXTENDED_DATA_ROOTDIR, dir.getAbsolutePath());
-        mContext.startService(intent);
     }
 
     public void startSendFileService(String filePath){

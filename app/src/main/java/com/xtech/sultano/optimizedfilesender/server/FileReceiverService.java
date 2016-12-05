@@ -103,5 +103,6 @@ public class FileReceiverService extends Service{
     @Override
     public void onDestroy() {
         Toast.makeText(this, "startFileReceiverThread destroyed", Toast.LENGTH_SHORT).show();
+        stopSelf();
     }
 }
