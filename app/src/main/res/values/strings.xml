@@ -30,4 +30,9 @@
     <string name="dialog_title_list_preference">Title List preference</string>
     <string name="dialog_title_edittext_preference">Edittext Preference title</string>
     <string name="default_checkbox_preference">true</string>
+
+
+    <!-- search bar -->
+    <string name="app_label">Optimized File Manager</string>
+    <string name="search_hint">Search File or REGEX pattern</string>
 </resources>
