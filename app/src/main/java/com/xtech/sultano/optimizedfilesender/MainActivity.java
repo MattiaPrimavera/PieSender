@@ -1,5 +1,8 @@
 package com.xtech.sultano.optimizedfilesender;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -11,11 +14,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterFactory;
 import com.xtech.sultano.optimizedfilesender.view.DownloadView;
+import com.xtech.sultano.optimizedfilesender.view.SettingsView;
 import com.xtech.sultano.optimizedfilesender.view.UploadView;
 import com.xtech.sultano.optimizedfilesender.view.UiView;
 
@@ -127,13 +132,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
-
         } else if (id == R.id.nav_send) {
-
+        }else if(id == R.id.action_settings){
+            Log.d("LOG28", "clicked on nav_connect");
+            SettingsView settingsView = SettingsView.newInstance();
+            this.replaceFragment(R.id.content_main, settingsView);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void replaceFragment(int toReplace, Fragment withFragment){
+        //gets Fragment Manager
+        FragmentManager fragmentManager = getFragmentManager();
+
+        //starts the transaction
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        Fragment toHide = fragmentManager.findFragmentById(toReplace);
+//        ft.hide(toHide);
+        ft.replace(toReplace, withFragment);
+        ft.show(withFragment);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 }

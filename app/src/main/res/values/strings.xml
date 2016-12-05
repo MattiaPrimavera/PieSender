@@ -9,4 +9,25 @@
     <string name="action_settings">Settings</string>
     <string name="action_send_all_files">Send All</string>
     <string name="send_to">Send To</string>
+
+    <!-- Preferences screen -->
+    <string name="title_first_section">First Section</string>
+    <string name="title_checkbox_preference">Checkbox Preference</string>
+    <string name="title_edittext_preference"></string>
+    <string name="summary_edittext_preference"></string>
+    <string name="title_second_section">Second Section</string>
+    <array name="entries_list_preference">
+        <item name="title_list_preference">List Preference</item>
+        <item name="custom_intent">Custom Intent</item>
+    </array>
+    <array name="entryvalues_list_preference">
+        <item name="title_list_preference_value">List Preference</item>
+        <item name="custom_intent_value">Custom Intent</item>
+    </array>
+
+    <string name="title_list_preference">Title List Preference</string>
+    <string name="title_intent_preference">Title Intent preference</string>
+    <string name="dialog_title_list_preference">Title List preference</string>
+    <string name="dialog_title_edittext_preference">Edittext Preference title</string>
+    <string name="default_checkbox_preference">true</string>
 </resources>
