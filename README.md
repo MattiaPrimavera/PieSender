@@ -7,7 +7,7 @@
 - [Using lists and grids in Android with RecylerView - Tutorial](http://www.vogella.com/tutorials/AndroidRecyclerView/article.html)
 - [Using the RecycleView](https://guides.codepath.com/android/using-the-recyclerview)
 - [RecycleView animations](https://www.sitepoint.com/mastering-complex-lists-with-the-android-recyclerview/)
-
+- [Bound Services](http://www.truiton.com/2014/11/bound-service-example-android/)
 ## Sources
 For what it concerns MVP pattern:
 - [MVP for Android: how to organize the presentation layer](http://antonioleiva.com/mvp-android/)
