@@ -6,6 +6,7 @@
 - [AVLoadingIndicatorView](https://github.com/81813780/AVLoadingIndicatorView)  
 - [Using lists and grids in Android with RecylerView - Tutorial](http://www.vogella.com/tutorials/AndroidRecyclerView/article.html)
 - [Using the RecycleView](https://guides.codepath.com/android/using-the-recyclerview)
+- [RecycleView animations](https://www.sitepoint.com/mastering-complex-lists-with-the-android-recyclerview/)
 
 ## Sources
 For what it concerns MVP pattern:
