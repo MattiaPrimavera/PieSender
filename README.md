@@ -5,6 +5,7 @@
 - [Using an ArrayAdapter with ListView](https://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView)
 - [AVLoadingIndicatorView](https://github.com/81813780/AVLoadingIndicatorView)  
 - [Using lists and grids in Android with RecylerView - Tutorial](http://www.vogella.com/tutorials/AndroidRecyclerView/article.html)
+- [Using the RecycleView](https://guides.codepath.com/android/using-the-recyclerview)
 
 ## Sources
 For what it concerns MVP pattern:
