@@ -91,7 +91,7 @@ public class FileReceiverService extends Service{
         mServiceHandler.sendMessage(msg);
 
         // If we get killed, after returning from here, restart
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override

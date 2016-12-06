@@ -264,22 +264,6 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         this.createSendFileThread(currentDir.getPath());
     }
 
-/*    public void updateProgressBar(View v, float percentage){
-        float value = (float) (percentage / 100.0);
-        View bar1 = v.findViewById(R.id.myRectangleView);
-        View bar2 = v.findViewById(R.id.myRectangleView2);
-        bar1.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1 - value));
-        bar2.setLayoutParams(new TableLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, value));
-
-        //Update circular progress bar
-        ProgressBar circular = (ProgressBar) v.findViewById(R.id.circular_progressbar);
-        int percentageInt = (int)percentage;
-        circular.setProgress(percentageInt);
-
-        TextView progressBarText = (TextView) v.findViewById(R.id.circular_progressbar_label);
-        progressBarText.setText(Float.toString(percentage) + "%");
-    }
-*/
     public void replaceIconWithCircularProgressBar(View rowView){
         // Hiding File icon
         ImageView icon = (ImageView) rowView.findViewById(R.id.iconImageView);
@@ -342,14 +326,12 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         }
     }
 
-    //Loader callbacks.
     @Override
     public Loader<List<File>> onCreateLoader(int id, Bundle args) {
         this.mFileLoader = new FileLoader(mContext, mModel);
         return this.mFileLoader;
     }
 
-    //Called when the loader has finished acquiring its load.
     @Override
     public void onLoadFinished(Loader<List<File>> loader, List<File> data) {
         this.mData = data;
