@@ -6,14 +6,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -22,10 +26,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.xtech.sultano.optimizedfilesender.FileArrayAdapter;
+import com.xtech.sultano.optimizedfilesender.MainActivity;
 import com.xtech.sultano.optimizedfilesender.R;
+import com.xtech.sultano.optimizedfilesender.Searcher;
 import com.xtech.sultano.optimizedfilesender.observer.Observer;
-import com.xtech.sultano.optimizedfilesender.server.FileReceiver;
-import com.xtech.sultano.optimizedfilesender.server.FileReceiverService;
 import com.xtech.sultano.optimizedfilesender.service.DiscoveryService;
 import com.xtech.sultano.optimizedfilesender.service.FileSenderService;
 import com.xtech.sultano.optimizedfilesender.view.ConnectDialog;
@@ -120,12 +124,42 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
     /*Called to update the Adapter with a new list of files when mCurrentDir changes.*/
     private void updateAdapter(List<File> data) {
+        Log.d("LOG31", "udpating Adapter with search results ");
         //clear the old data.
         mFileArrayAdapter.clear();
         //add the new data.
         mFileArrayAdapter.addAll(data);
         //inform the ListView to refrest itself with the new data.
         mFileArrayAdapter.notifyDataSetChanged();
+    }
+
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView sv = new SearchView(((MainActivity)mView.getActivity()).getSupportActionBar().getThemedContext());
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setActionView(item, sv);
+
+        sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Searcher searcher = new Searcher(mModel);
+                ArrayList<File> result = searcher.search(query);
+
+                // Saving currentDir into stack for backPressed
+                File currentDir = mModel.getmCurrentDir();
+                mModel.setmPreviousDir(currentDir);
+
+                updateAdapter(result);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+//                System.out.println("tap");
+                return false;
+            }
+        });
+
     }
 
     public void listItemClicked(ListView l, View rowView, int position, long id) {
