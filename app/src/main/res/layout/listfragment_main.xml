@@ -5,11 +5,20 @@
     android:background="@android:color/black"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerList"
+        android:background="@android:color/holo_red_light"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical" />
     <ListView
         android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="0dp"
+        android:layout_height="0dp">
     </ListView>
+
     <!--- If there list is empty, display a text view that tells us that -->
     <TextView
         android:id="@android:id/empty"

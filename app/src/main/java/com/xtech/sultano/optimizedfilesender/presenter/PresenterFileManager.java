@@ -25,7 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.xtech.sultano.optimizedfilesender.FileArrayAdapter;
+import com.xtech.sultano.optimizedfilesender.FileAdapter;
 import com.xtech.sultano.optimizedfilesender.MainActivity;
 import com.xtech.sultano.optimizedfilesender.R;
 import com.xtech.sultano.optimizedfilesender.Searcher;
@@ -33,7 +33,7 @@ import com.xtech.sultano.optimizedfilesender.observer.Observer;
 import com.xtech.sultano.optimizedfilesender.service.DiscoveryService;
 import com.xtech.sultano.optimizedfilesender.service.FileSenderService;
 import com.xtech.sultano.optimizedfilesender.view.ConnectDialog;
-import com.xtech.sultano.optimizedfilesender.view.UiView;
+import com.xtech.sultano.optimizedfilesender.view.FileView;
 import com.xtech.sultano.optimizedfilesender.model.Model.Model;
 import java.io.File;
 import java.net.InetAddress;
@@ -48,9 +48,9 @@ import java.util.Set;
  * the view and model done here.
  **/
 public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<File>>, Observer {
-    private UiView mView; //Our view.
+    private FileView mView; //Our view.
     private Model mModel; //Our model.
-    private FileArrayAdapter mFileArrayAdapter; //The adapter containing data for our list.
+    private FileAdapter mFileAdapter; //The adapter containing data for our list.
     private List<File> mData; //The list of all files for a specific dir.
     private final int LOADER_ID = 101;
     private Context mContext;
@@ -63,7 +63,7 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
     private FileLoader mFileLoader; /*Loads the list of files from the model in
     a background thread.*/
 
-    public PresenterFileManager(UiView mView, Model mModel, Context context, LoaderManager mLoaderManager) {
+    public PresenterFileManager(FileView mView, Model mModel, Context context, LoaderManager mLoaderManager) {
         this.mView = mView;
         this.mServerName = "MattiaServerTest3";
         this.mReceiverSet = false;
@@ -73,7 +73,10 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         this.mContext = context;
         this.mDiscoveryResponse = null;
         this.mDestAddr = null;
-        this.init();
+    }
+
+    public Model getModel(){
+        return mModel;
     }
 
     /* Checks if external storage is available for read and write */
@@ -95,10 +98,12 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         return false;
     }
 
-    private void init() {
+    public void setFileAdapter(FileAdapter fileAdapter){
+        this.mFileAdapter = fileAdapter;
+    }
+
+    public void init() {
         //Instantiate and configure the file adapter with an empty list that our loader will update..
-        mFileArrayAdapter = new FileArrayAdapter(mContext, R.layout.list_row, mData);
-        mView.setListAdapter(mFileArrayAdapter);
 
         this.startLoader();
 
@@ -110,6 +115,7 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
     }
 
     private void startLoader(){
+        Log.d("LOG34", "presenter startingLoader");
         /*
             Start the AsyncTaskLoader that will update the adapter for
             the ListView. We update the adapter in the onLoadFinished() callback.
@@ -123,14 +129,14 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
     }
 
     /*Called to update the Adapter with a new list of files when mCurrentDir changes.*/
-    private void updateAdapter(List<File> data) {
-        Log.d("LOG31", "udpating Adapter with search results ");
+    public void updateAdapter(List<File> data) {
+        Log.d("LOG34", "udpating Adapter with search results ");
         //clear the old data.
-        mFileArrayAdapter.clear();
+        mFileAdapter.clear();
         //add the new data.
-        mFileArrayAdapter.addAll(data);
+        mFileAdapter.addAll(data);
         //inform the ListView to refrest itself with the new data.
-        mFileArrayAdapter.notifyDataSetChanged();
+        mFileAdapter.notifyDataSetChanged();
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
@@ -164,7 +170,7 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
     public void listItemClicked(ListView l, View rowView, int position, long id) {
         //The file we clicked based on row position where we clicked.  I could probably word that better. :)
-        File fileClicked = mFileArrayAdapter.getItem(position);
+        File fileClicked = mFileAdapter.getItem(position);
         
         if (fileClicked.isDirectory()) {
             //we are changing dirs, so save the previous dir as the one we are currently in.
@@ -195,7 +201,7 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
             // Check if receiver address is set
             if(!mReceiverSet){ // ----> TO-DO: This should be saved into Android preferences
-                Log.d("LOG19", "starting intent to set receiver ... ");
+                Log.d("LOG34", "starting intent to set receiver ... ");
                 this.receiveDiscoveryResponse();
                 intent = new Intent(mContext, DiscoveryService.class);
                 intent.putExtra(DiscoveryService.EXTENDED_SERVER_NAME, mServerName);
@@ -219,7 +225,7 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
     }
 
     public void receiveDiscoveryResponse(){
-        Log.d("LOG19", "receiveDiscoveryResponse prepared ... ");
+        Log.d("LOG34", "receiveDiscoveryResponse prepared ... ");
         // Declaring a Broadcast Receiver
         mReceiver = new BroadcastReceiver() {
             @Override
@@ -239,7 +245,7 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         // create a list view dialog
         Set<String> keys = discoveryResponse.keySet();
         for(String tmp : keys){
-            Log.d("LOG19", "discoveryResponse: " + tmp);
+            Log.d("LOG34", "discoveryResponse: " + tmp);
         }
         String[] serverNames = keys.toArray(new String[keys.size()]);
 
@@ -250,7 +256,7 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
     public boolean longListItemClicked(AdapterView<?> adapter, View rowView, int position, long id) {
         //The file we clicked based on row position where we clicked.  I could probably word that better. :)
-        File fileClicked = mFileArrayAdapter.getItem(position);
+        File fileClicked = mFileAdapter.getItem(position);
 
         if (fileClicked.isDirectory()) {
             this.replaceIconWithCircularProgressBar(rowView);
@@ -328,12 +334,14 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
     @Override
     public Loader<List<File>> onCreateLoader(int id, Bundle args) {
+        Log.d("LOG34", "presenter onCreateLoader");
         this.mFileLoader = new FileLoader(mContext, mModel);
         return this.mFileLoader;
     }
 
     @Override
     public void onLoadFinished(Loader<List<File>> loader, List<File> data) {
+        Log.d("LOG34", "presenter onLoadFinished");
         this.mData = data;
         /* My data source has changed so now the adapter needs to be reset to reflect the changes
         in the ListView.*/
@@ -342,10 +350,12 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
     @Override
     public void onLoaderReset(Loader<List<File>> loader) {
-        this.mFileArrayAdapter.clear();
+        Log.d("LOG34", "presenter onLoaderReset");
+        this.mFileAdapter.clear();
     }
 
     public void onResume(){
+        Log.d("LOG34", "presenter onResume");
         this.startLoader();
     }
 

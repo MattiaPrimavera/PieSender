@@ -27,7 +27,7 @@ import com.xtech.sultano.optimizedfilesender.server.FileReceiverService;
 import com.xtech.sultano.optimizedfilesender.view.DownloadView;
 import com.xtech.sultano.optimizedfilesender.view.SettingsView;
 import com.xtech.sultano.optimizedfilesender.view.UploadView;
-import com.xtech.sultano.optimizedfilesender.view.UiView;
+import com.xtech.sultano.optimizedfilesender.view.FileView;
 
 import java.io.File;
 
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private LoaderManager mLoaderManager;
     private Fragment currentFragment;
     private boolean fileExplorerHidden;
-    private UiView mView;
+    private FileView mView;
     private UploadView mUploadView;
     private DownloadView mDownloadView;
     private ViewPager mViewPager;
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
 
         // UI Fragments
-        mView = UiView.newInstance();
+        mView = FileView.newInstance();
         mView.setRetainInstance(true);
         mUploadView = UploadView.newInstance();
         mUploadView.setRetainInstance(true);
