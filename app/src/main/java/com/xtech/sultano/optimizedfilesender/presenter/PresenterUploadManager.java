@@ -13,12 +13,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import com.xtech.sultano.optimizedfilesender.Client.FileSender;
-import com.xtech.sultano.optimizedfilesender.UploadArrayAdapter;
-import com.xtech.sultano.optimizedfilesender.R;
+import com.xtech.sultano.optimizedfilesender.UploadAdapter;
 import com.xtech.sultano.optimizedfilesender.model.Model.Upload;
 import com.xtech.sultano.optimizedfilesender.model.Model.UploadModel;
 import com.xtech.sultano.optimizedfilesender.service.FileSenderService;
@@ -31,7 +28,7 @@ import java.util.List;
 public class PresenterUploadManager implements LoaderManager.LoaderCallbacks<List<Upload>> {
     private UploadView mView; //Our view.
     private UploadModel mModel; //Our model.
-    private UploadArrayAdapter mUploadArrayAdapter; //The adapter containing data for our list.
+    private UploadAdapter mUploadAdapter; //The adapter containing data for our list.
     private List<Upload> mData; //The list of all Uploads
     private final int LOADER_ID = 102;
     private Context mContext;
@@ -53,13 +50,14 @@ public class PresenterUploadManager implements LoaderManager.LoaderCallbacks<Lis
         this.mHandler = new Handler();
         this.lastRefreshTime = System.currentTimeMillis();
         this.economy = 0;
-        this.init();
     }
 
-    private void init() {
+    public void setUploadAdapter(UploadAdapter a){
+        this.mUploadAdapter = a;
+    }
+
+    public void init() {
         //Instantiate and configure the file adapter with an empty list that our loader will update..
-        mUploadArrayAdapter = new UploadArrayAdapter(mContext, R.layout.list_row_upload, mData);
-        mView.setListAdapter(mUploadArrayAdapter);
 
         this.startLoader();
         this.updateUI();
@@ -96,7 +94,7 @@ public class PresenterUploadManager implements LoaderManager.LoaderCallbacks<Lis
         //mUploadLoader = new UploadLoader(mView.getActivity());
     }
 
-    private synchronized void startLoader(){
+    public synchronized void startLoader(){
         /*
             Start the AsyncTaskLoader that will update the adapter for
             the ListView. We update the adapter in the onLoadFinished() callback.
@@ -161,9 +159,9 @@ public class PresenterUploadManager implements LoaderManager.LoaderCallbacks<Lis
     public synchronized void updateAdapter(List<Upload> data) {
         Log.d("LOGUploader", "UPDATING ADAPTER");
         //clear the old data.
-        mUploadArrayAdapter.setData(data);
+        mUploadAdapter.setData(data);
         //inform the ListView to refrest itself with the new data.
-        mUploadArrayAdapter.notifyDataSetChanged();
+        mUploadAdapter.notifyDataSetChanged();
     }
 
     public void listItemClicked(ListView l, View rowView, int position, long id) {
@@ -171,41 +169,6 @@ public class PresenterUploadManager implements LoaderManager.LoaderCallbacks<Lis
 
     public boolean longListItemClicked(AdapterView<?> adapter, View rowView, int position, long id) {
         return false;
-    }
-
-    public synchronized void updateProgressBar(){
-        ListView rootView = null;
-        try {
-            if(mModel == null) return;
-            for (int i = 0; i < mModel.getUploadNumber(); i++) {
-                try {
-                    if(!mView.isAdded())
-                        return;
-                    rootView = mView.getListView();
-                    View v;
-                    v = rootView.getChildAt(i);
-                    int percentage = mModel.getUpload(i).getProgress();
-
-                    ProgressBar progressBar = (ProgressBar) v.findViewById(R.id.send_progress_bar);
-                    Log.d("TEST:", "updating View n^" + Integer.toString(i) + "percentage set: " + Integer.toString(percentage));
-                    if (progressBar != null)
-                        progressBar.setProgress(percentage);
-
-                    TextView progressBarText = (TextView) v.findViewById(R.id.upload_progressbar_label);
-                    if (progressBarText != null)
-                        progressBarText.setText(Integer.toString(percentage) + "%");
-                } catch (Exception e) {
-                    Log.d("TEST:", "updating lastView is " + Integer.toString(i - 1));
-                    e.printStackTrace();
-                    return;
-                }
-
-            }
-//            if(rootView != null)
-//                rootView.requestLayout();
-        }catch(Exception ef){
-            ef.printStackTrace();
-        }
     }
 
     public void makeToast(CharSequence text){

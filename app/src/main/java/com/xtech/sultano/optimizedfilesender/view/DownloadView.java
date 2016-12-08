@@ -1,7 +1,10 @@
 package com.xtech.sultano.optimizedfilesender.view;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,14 +14,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.xtech.sultano.optimizedfilesender.DownloadAdapter;
 import com.xtech.sultano.optimizedfilesender.R;
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterDownloadManager;
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterFactory;
 
-public class DownloadView extends ListFragment {
+public class DownloadView extends Fragment {
     //This is a passive view, so my mPresenterDownloadManager handles all of the updating, etc.
     private PresenterDownloadManager mPresenterDownloadManager;
     private PresenterFactory mPresenterFactory;
+    private DownloadAdapter mDownloadAdapter;
 
     public void setPresenterDownloadManager(PresenterDownloadManager p) {
         mPresenterDownloadManager = p;
@@ -45,14 +50,28 @@ public class DownloadView extends ListFragment {
     //Return the view to the Activity for display.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.listfragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.listfragment_main, container, false);
+        PresenterDownloadManager presenterDownloadManager = mPresenterFactory.getPresenterDownloadManager();
+        mDownloadAdapter = new DownloadAdapter();
+
+        RecyclerView recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerList);
+        recyclerView.setAdapter(mDownloadAdapter);
+        recyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this.getActivity());
+        recyclerView.setLayoutManager(mLayoutManager);
+        presenterDownloadManager.setDownloadAdapter(mDownloadAdapter);
+        setPresenterDownloadManager(presenterDownloadManager);
+        presenterDownloadManager.init();
+        return rootView;
     }
 
     //This is a good place to do final initialization as the Fragment is finished initializing itself.
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setPresenterDownloadManager(mPresenterFactory.getPresenterDownloadManager());
+/*        setPresenterDownloadManager(mPresenterFactory.getPresenterDownloadManager());
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
@@ -60,7 +79,7 @@ public class DownloadView extends ListFragment {
                 mPresenterDownloadManager.longListItemClicked(adapter, v, position, id);
                 return true;
             }
-        });
+        });*/
     }
 
     public void onBackPressed(){
@@ -68,11 +87,11 @@ public class DownloadView extends ListFragment {
     }
 
     //When we intercept a click, call through to the appropriate method in the mPresenterDownloadManager.
-    @Override
+/*    @Override
     public void onListItemClick(ListView listView, android.view.View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
         mPresenterDownloadManager.listItemClicked(listView, view, position, id);
-    }
+    }*/
 
 
 

@@ -55,9 +55,8 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     public void addAll(List<File> files){
         Log.d("LOG34", "FileAdapter addAll");
         mObjects.clear();
-        for(int i = 0; i < files.size(); i++){
-            this.add(i, files.get(i));
-        }
+        mObjects.addAll(files);
+        this.notifyItemRangeChanged(0, files.size());
     }
 
     public File getItem(int i) {
@@ -116,13 +115,13 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
 
             //Finally, set the name of the file or directory.
             holder.nameView.setText(file.getName());
-            holder.listItemInfo.bringToFront();
+//            holder.listItemInfo.bringToFront();
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        Log.d("LOG34", "FileAdapter getItemCount");
+        Log.d("LOG34", "FileAdapter getItemCount: " + Integer.toString(mObjects.size()));
         return mObjects.size();
     }
 }

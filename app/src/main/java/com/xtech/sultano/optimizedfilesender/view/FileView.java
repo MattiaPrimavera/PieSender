@@ -32,10 +32,6 @@ public class FileView extends Fragment {
 
     public void setPresenterFileManager(PresenterFileManager p) {
         presenterFileManager = p;
-
-        /*I am not using this, but I like to enable it just in case I want to populate the overflow menu
-        with menu options
-         */
         setHasOptionsMenu(true);
     }
 
@@ -44,8 +40,7 @@ public class FileView extends Fragment {
     public void setPresenterFactory(PresenterFactory presenterFactory){ this.mPresenterFactory = presenterFactory; }
 
     /**
-     * Returns a new instance of this fragment for the given section
-     * number.
+     * Returns a new instance of this fragment for the given section number.
      */
     public static FileView newInstance() {
         FileView fragment = new FileView();
@@ -66,6 +61,7 @@ public class FileView extends Fragment {
         if(model == null){
             Log.d("LOG34", "model NULL");
         }
+
         List<File> allFiles = model.getAllFiles(model.getmCurrentDir());
         if(allFiles != null){
             Log.d("LOG34", "ALL_FILE_SIZE: " + Integer.toString(allFiles.size()));
@@ -84,16 +80,15 @@ public class FileView extends Fragment {
             Log.d("LOG34", "recyclerView NULL");
         }
 
-        recyclerView.setAdapter(mFileAdapter);
-        recyclerView.setHasFixedSize(true);
-
         // use a linear layout manager
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this.getActivity());
         recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setAdapter(mFileAdapter);
         presenterFileManager.setFileAdapter(mFileAdapter);
         setPresenterFileManager(presenterFileManager);
         presenterFileManager.init();
-        presenterFileManager.updateAdapter(allFiles);
+        //presenterFileManager.updateAdapter(allFiles);
+        recyclerView.setHasFixedSize(true);
         return rootView;
     }
 

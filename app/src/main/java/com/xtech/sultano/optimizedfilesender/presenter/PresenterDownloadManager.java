@@ -13,27 +13,19 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
-import com.xtech.sultano.optimizedfilesender.Client.FileSender;
-import com.xtech.sultano.optimizedfilesender.DownloadArrayAdapter;
-import com.xtech.sultano.optimizedfilesender.R;
+import com.xtech.sultano.optimizedfilesender.DownloadAdapter;
 import com.xtech.sultano.optimizedfilesender.model.Model.Download;
 import com.xtech.sultano.optimizedfilesender.model.Model.DownloadModel;
 import com.xtech.sultano.optimizedfilesender.server.FileReceiver;
-import com.xtech.sultano.optimizedfilesender.server.FileReceiverService;
-import com.xtech.sultano.optimizedfilesender.service.FileSenderService;
-import com.xtech.sultano.optimizedfilesender.utils.FileUtils;
 import com.xtech.sultano.optimizedfilesender.view.DownloadView;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<List<Download>> {
     private DownloadView mView; //Our view.
     private DownloadModel mModel; //Our model.
-    private DownloadArrayAdapter mDownloadArrayAdapter; //The adapter containing data for our list.
+    private DownloadAdapter mDownloadAdapter; //The adapter containing data for our list.
     private List<Download> mData; //The list of all downloads
     private final int LOADER_ID = 102;
     private Context mContext;
@@ -55,13 +47,13 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         this.mHandler = new Handler();
         this.lastRefreshTime = System.currentTimeMillis();
         this.economy = 0;
-        this.init();
     }
 
-    private void init() {
-        //Instantiate and configure the file adapter with an empty list that our loader will update..
-        mDownloadArrayAdapter = new DownloadArrayAdapter(mContext, R.layout.list_row_download, mData);
-        mView.setListAdapter(mDownloadArrayAdapter);
+    public void setDownloadAdapter(DownloadAdapter d){
+        this.mDownloadAdapter = d;
+    }
+
+    public void init() {
 
         this.startLoader();
         this.updateUI();
@@ -103,7 +95,7 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         //mDownloadLoader = new DownloadLoader(mView.getActivity());
     }
 
-    private synchronized void startLoader(){
+    public synchronized void startLoader(){
         /*
             Start the AsyncTaskLoader that will update the adapter for
             the ListView. We update the adapter in the onLoadFinished() callback.
@@ -162,9 +154,9 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     public synchronized void updateAdapter(List<Download> data) {
         Log.d("LOGDownloader", "UPDATING ADAPTER");
         //clear the old data.
-        mDownloadArrayAdapter.setData(data);
+        mDownloadAdapter.setData(data);
         //inform the ListView to refrest itself with the new data.
-        mDownloadArrayAdapter.notifyDataSetChanged();
+        mDownloadAdapter.notifyDataSetChanged();
     }
 
     public void listItemClicked(ListView l, View rowView, int position, long id) {
@@ -172,41 +164,6 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
 
     public boolean longListItemClicked(AdapterView<?> adapter, View rowView, int position, long id) {
         return false;
-    }
-
-    public synchronized void updateProgressBar(){
-        ListView rootView = null;
-        try {
-            if(mModel == null) return;
-            for (int i = 0; i < mModel.getDownloadNumber(); i++) {
-                try {
-                    if(!mView.isAdded())
-                        return;
-                    rootView = mView.getListView();
-                    View v;
-                    v = rootView.getChildAt(i);
-                    int percentage = mModel.getDownload(i).getProgress();
-
-                    ProgressBar progressBar = (ProgressBar) v.findViewById(R.id.send_progress_bar);
-                    Log.d("TEST:", "updating View n^" + Integer.toString(i) + "percentage set: " + Integer.toString(percentage));
-                    if (progressBar != null)
-                        progressBar.setProgress(percentage);
-
-                    TextView progressBarText = (TextView) v.findViewById(R.id.download_progressbar_label);
-                    if (progressBarText != null)
-                        progressBarText.setText(Integer.toString(percentage) + "%");
-                } catch (Exception e) {
-                    Log.d("TEST:", "updating lastView is " + Integer.toString(i - 1));
-                    e.printStackTrace();
-                    return;
-                }
-
-            }
-//            if(rootView != null)
-//                rootView.requestLayout();
-        }catch(Exception ef){
-            ef.printStackTrace();
-        }
     }
 
     public void makeToast(CharSequence text){

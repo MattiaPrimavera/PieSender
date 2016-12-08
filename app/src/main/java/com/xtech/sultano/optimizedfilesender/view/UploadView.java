@@ -1,7 +1,10 @@
 package com.xtech.sultano.optimizedfilesender.view;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,13 +15,15 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.xtech.sultano.optimizedfilesender.R;
+import com.xtech.sultano.optimizedfilesender.UploadAdapter;
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterUploadManager;
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterFactory;
 
-public class UploadView extends ListFragment {
+public class UploadView extends Fragment {
     //This is a passive view, so my mPresenterUploadManager handles all of the updating, etc.
     private PresenterUploadManager mPresenterUploadManager;
     private PresenterFactory mPresenterFactory;
+    private UploadAdapter mUploadAdapter;
 
     public void setPresenterUploadManager(PresenterUploadManager p) {
         mPresenterUploadManager = p;
@@ -45,14 +50,27 @@ public class UploadView extends ListFragment {
     //Return the view to the Activity for display.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.listfragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.listfragment_main, container, false);
+        PresenterUploadManager presenterUploadManager = mPresenterFactory.getPresenterUploadManager();
+        mUploadAdapter = new UploadAdapter();
+
+        RecyclerView recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerList);
+        recyclerView.setAdapter(mUploadAdapter);
+        recyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this.getActivity());
+        recyclerView.setLayoutManager(mLayoutManager);
+        presenterUploadManager.setUploadAdapter(mUploadAdapter);
+        setPresenterUploadManager(presenterUploadManager);
+        return rootView;
     }
 
     //This is a good place to do final initialization as the Fragment is finished initializing itself.
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setPresenterUploadManager(mPresenterFactory.getPresenterUploadManager());
+        /*setPresenterUploadManager(mPresenterFactory.getPresenterUploadManager());
         getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             @Override
@@ -60,7 +78,7 @@ public class UploadView extends ListFragment {
                 mPresenterUploadManager.longListItemClicked(adapter, v, position, id);
                 return true;
             }
-        });
+        });*/
     }
 
     public void onBackPressed(){
@@ -68,11 +86,11 @@ public class UploadView extends ListFragment {
     }
 
     //When we intercept a click, call through to the appropriate method in the mPresenterUploadManager.
-    @Override
+/*    @Override
     public void onListItemClick(ListView listView, android.view.View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
         mPresenterUploadManager.listItemClicked(listView, view, position, id);
-    }
+    }*/
 
 
 
