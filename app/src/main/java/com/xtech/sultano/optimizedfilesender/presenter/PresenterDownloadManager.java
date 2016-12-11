@@ -9,6 +9,8 @@ import android.os.Handler;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -37,6 +39,7 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     private long lastRefreshTime;
     private int economy;
     private static final int REFRESH_RATE = 3; // milliseconds
+    private RecyclerView.LayoutManager mLayoutManager;
 
     public PresenterDownloadManager(DownloadView mView, DownloadModel mModel, Context context, LoaderManager mLoaderManager) {
         this.mView = mView;
@@ -47,6 +50,22 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
         this.mHandler = new Handler();
         this.lastRefreshTime = System.currentTimeMillis();
         this.economy = 0;
+        this.mDownloadAdapter = new DownloadAdapter();
+        this.mLayoutManager = null;
+    }
+
+    public void setRecyclerView(RecyclerView recyclerView){
+        // use a linear layout manager
+        if(mLayoutManager == null){
+            mLayoutManager = new LinearLayoutManager(mContext);
+            recyclerView.setLayoutManager(mLayoutManager);
+        }
+        recyclerView.setAdapter(mDownloadAdapter);
+        recyclerView.setHasFixedSize(true);
+    }
+
+    public DownloadAdapter getAdapter(){
+        return mDownloadAdapter;
     }
 
     public void setDownloadAdapter(DownloadAdapter d){
@@ -115,8 +134,11 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
 //            mLoaderManager.restartLoader(LOADER_ID, null, this);
             if(mDownloadLoader == null)
                 this.startLoader();
-            if (mDownloadLoader.isStarted()) {
-                mDownloadLoader.onContentChanged();
+            else{
+                if (mDownloadLoader.isStarted()) {
+                    mDownloadLoader.onContentChanged();
+                }
+                this.updateUI();
             }
         }
     }
@@ -154,15 +176,16 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     public synchronized void updateAdapter(List<Download> data) {
         Log.d("LOGDownloader", "UPDATING ADAPTER");
         //clear the old data.
+        mDownloadAdapter.clear();
         mDownloadAdapter.setData(data);
         //inform the ListView to refrest itself with the new data.
         mDownloadAdapter.notifyDataSetChanged();
     }
 
-    public void listItemClicked(ListView l, View rowView, int position, long id) {
+    public void listItemClicked(View rowView, int position) {
     }
 
-    public boolean longListItemClicked(AdapterView<?> adapter, View rowView, int position, long id) {
+    public boolean longListItemClicked(View rowView, int position) {
         return false;
     }
 

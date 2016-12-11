@@ -36,8 +36,23 @@ public class PresenterFactory<T extends PresenterFileManager> {
         mDownloadView = downloadView;
         mLoaderManager = loaderManager;
 
+        this.createViews();
         this.createModels();
         this.createPresenters();
+    }
+
+    public FileView getFileView(){ return this.mUiView; }
+    public UploadView getUploadView(){ return this.mUploadView; }
+    public DownloadView getDownloadView(){ return this.mDownloadView; }
+
+    public void createViews(){
+        // UI Fragments
+        mUiView = FileView.newInstance();
+        mUiView.setRetainInstance(true);
+        mUploadView = UploadView.newInstance();
+        mUploadView.setRetainInstance(true);
+        mDownloadView = DownloadView.newInstance();
+        mDownloadView.setRetainInstance(true);
     }
 
     public void createPresenters(){

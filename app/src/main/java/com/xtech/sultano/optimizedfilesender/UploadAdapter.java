@@ -35,7 +35,7 @@ public class UploadAdapter extends RecyclerView.Adapter<UploadAdapter.ViewHolder
             detailsView = (TextView) v.findViewById(R.id.details_text_view);
             bar1 = v.findViewById(R.id.myRectangleView);
             bar2 = v.findViewById(R.id.myRectangleView2);
-            progressBarText = (TextView) v.findViewById(R.id.download_progressbar_label);
+            progressBarText = (TextView) v.findViewById(R.id.upload_progressbar_label);
             listItemInfo = (LinearLayout) v.findViewById(R.id.listeitem_info_layout);
         }
     }
@@ -60,12 +60,11 @@ public class UploadAdapter extends RecyclerView.Adapter<UploadAdapter.ViewHolder
         mObjects.clear();
     }
 
-    public void addAll(List<Upload> uploads){
+    public synchronized void addAll(List<Upload> uploads){
         Log.d("LOG34", "UploadAdapter addAll");
         mObjects.clear();
-        for(int i = 0; i < uploads.size(); i++){
-            this.add(i, uploads.get(i));
-        }
+        mObjects.addAll(uploads);
+        this.notifyItemRangeChanged(0, uploads.size());
     }
 
     public Upload getItem(int i) {
@@ -120,7 +119,7 @@ public class UploadAdapter extends RecyclerView.Adapter<UploadAdapter.ViewHolder
         icon.setImageResource(id);
     }
 
-    public void setData(List<Upload> data) {
+    public synchronized void setData(List<Upload> data) {
         clear();
         if (data != null) {
             addAll(data);

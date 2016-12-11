@@ -54,22 +54,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
 
-        // UI Fragments
-        mView = FileView.newInstance();
-        mView.setRetainInstance(true);
-        mUploadView = UploadView.newInstance();
-        mUploadView.setRetainInstance(true);
-        mDownloadView = DownloadView.newInstance();
-        mDownloadView.setRetainInstance(true);
         currentFragment = null;
 
         mLoaderManager = getSupportLoaderManager();
         mPresenterFactory = new PresenterFactory(mView, mUploadView, mDownloadView, this, mLoaderManager);
 
-        // Setting Presenter Factory for UI Fragments
-        mView.setPresenterFactory(mPresenterFactory);
-        mUploadView.setPresenterFactory(mPresenterFactory);
-        mDownloadView.setPresenterFactory(mPresenterFactory);
+        // Getting UI fragments from PresenterFactory
+        mView = mPresenterFactory.getFileView();
+        mUploadView = mPresenterFactory.getUploadView();
+        mDownloadView = mPresenterFactory.getDownloadView();
+
+        // Setting Presenters
+        mView.setPresenterFileManager(mPresenterFactory.getPresenterFileManager());
+        mUploadView.setPresenterUploadManager(mPresenterFactory.getPresenterUploadManager());
+        mDownloadView.setPresenterDownloadManager(mPresenterFactory.getPresenterDownloadManager());
+
 
         // Graphical interface is composed by two views, accessible through a tabbed layout
         mSectionsPagerAdapter.addPage(mView, "ONE");

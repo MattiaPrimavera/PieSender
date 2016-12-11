@@ -1,5 +1,7 @@
 package com.xtech.sultano.optimizedfilesender.model.Model;
 
+import android.util.Log;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,6 +66,20 @@ public class UploadModel {
             d.setProgress(percentage);
             d.setSentData(sentData);
             updated = true;
+        }
+        return updated;
+    }
+    
+    public synchronized boolean updateProgress(String filename, int percentage, long sentData, long totalSize){
+        boolean updated = false;
+        Upload d = this.getUploadByFilePath(filename);
+        if(d != null){
+            Log.d("LOG23", "not null");
+            d.setProgress(percentage);
+            d.setSentData(sentData);
+            updated = true;
+        }else{
+            this.addUpload(new Upload(new File(filename), totalSize, false, percentage));
         }
         return updated;
     }

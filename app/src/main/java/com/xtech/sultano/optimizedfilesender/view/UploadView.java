@@ -32,6 +32,7 @@ public class UploadView extends Fragment {
         with menu options
          */
         setHasOptionsMenu(true);
+        mPresenterUploadManager.init();
     }
 
     public PresenterUploadManager getmPresenterUploadManager(){ return this.mPresenterUploadManager; }
@@ -50,19 +51,9 @@ public class UploadView extends Fragment {
     //Return the view to the Activity for display.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.listfragment_main, container, false);
-        PresenterUploadManager presenterUploadManager = mPresenterFactory.getPresenterUploadManager();
-        mUploadAdapter = new UploadAdapter();
-
-        RecyclerView recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerList);
-        recyclerView.setAdapter(mUploadAdapter);
-        recyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this.getActivity());
-        recyclerView.setLayoutManager(mLayoutManager);
-        presenterUploadManager.setUploadAdapter(mUploadAdapter);
-        setPresenterUploadManager(presenterUploadManager);
+        View rootView = inflater.inflate(R.layout.upload_fragment, container, false);
+        RecyclerView recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerListUpload);
+        mPresenterUploadManager.setRecyclerView(recyclerView);
         return rootView;
     }
 
@@ -70,29 +61,11 @@ public class UploadView extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        /*setPresenterUploadManager(mPresenterFactory.getPresenterUploadManager());
-        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapter, View v, int position, long id) {
-                mPresenterUploadManager.longListItemClicked(adapter, v, position, id);
-                return true;
-            }
-        });*/
     }
 
     public void onBackPressed(){
         mPresenterUploadManager.homePressed();
     }
-
-    //When we intercept a click, call through to the appropriate method in the mPresenterUploadManager.
-/*    @Override
-    public void onListItemClick(ListView listView, android.view.View view, int position, long id) {
-        super.onListItemClick(listView, view, position, id);
-        mPresenterUploadManager.listItemClicked(listView, view, position, id);
-    }*/
-
-
 
     /* Populate options menu and or action bar with menu from res/menu/menu_main.xml*/
     @Override

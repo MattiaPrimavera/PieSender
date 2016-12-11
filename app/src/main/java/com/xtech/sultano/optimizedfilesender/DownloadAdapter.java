@@ -63,12 +63,11 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
         mObjects.clear();
     }
 
-    public void addAll(List<Download> downloads){
+    public synchronized void addAll(List<Download> downloads){
         Log.d("LOG34", "DownloadAdapter addAll");
         mObjects.clear();
-        for(int i = 0; i < downloads.size(); i++){
-            this.add(i, downloads.get(i));
-        }
+        mObjects.addAll(downloads);
+        this.notifyItemRangeChanged(0, downloads.size());
     }
 
     // Create new views (invoked by the layout manager)
@@ -119,7 +118,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
         icon.setImageResource(id);
     }
 
-    public void setData(List<Download> data) {
+    public synchronized void setData(List<Download> data) {
         clear();
         if (data != null) {
             addAll(data);

@@ -32,6 +32,7 @@ public class DownloadView extends Fragment {
         with menu options
          */
         setHasOptionsMenu(true);
+        mPresenterDownloadManager.init();
     }
 
     public PresenterDownloadManager getmPresenterDownloadManager(){ return this.mPresenterDownloadManager; }
@@ -50,20 +51,9 @@ public class DownloadView extends Fragment {
     //Return the view to the Activity for display.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.listfragment_main, container, false);
-        PresenterDownloadManager presenterDownloadManager = mPresenterFactory.getPresenterDownloadManager();
-        mDownloadAdapter = new DownloadAdapter();
-
-        RecyclerView recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerList);
-        recyclerView.setAdapter(mDownloadAdapter);
-        recyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this.getActivity());
-        recyclerView.setLayoutManager(mLayoutManager);
-        presenterDownloadManager.setDownloadAdapter(mDownloadAdapter);
-        setPresenterDownloadManager(presenterDownloadManager);
-        presenterDownloadManager.init();
+        View rootView = inflater.inflate(R.layout.download_fragment, container, false);
+        RecyclerView recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerListDownload);
+        mPresenterDownloadManager.setRecyclerView(recyclerView);
         return rootView;
     }
 

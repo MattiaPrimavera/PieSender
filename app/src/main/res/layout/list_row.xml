@@ -1,28 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@android:color/background_dark"
-    android:minHeight="?attr/listPreferredItemHeightSmall"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/listPreferredItemHeightSmall"
+    android:background="@android:color/black"
     android:paddingTop="0dip"
-    android:paddingLeft="0dip" android:paddingRight="0dip">
-
-    <!-- Background Views acting as progress bar -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <View
-            android:id="@+id/myRectangleView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/holo_red_dark" />
-        <View
-            android:id="@+id/myRectangleView2"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="#80000000"
-            android:layout_weight="0" />
-    </LinearLayout>
+    android:paddingLeft="0dip"
+    android:paddingRight="0dip">
 
     <LinearLayout
         android:id="@+id/listeitem_info_layout"
@@ -70,12 +53,12 @@
             </LinearLayout>
 
             <ImageView
-                    android:id="@+id/iconImageView"
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
-                    android:layout_alignParentLeft="true"/>
+                android:id="@+id/iconImageView"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="centerCrop"
+                android:layout_alignParentLeft="true"/>
         </LinearLayout>
         <LinearLayout
             android:orientation="vertical"
@@ -97,14 +80,6 @@
                 android:layout_toRightOf="@id/iconImageView"
                 android:textColor="@android:color/white"
                 android:textSize="10sp"/>
-            <ProgressBar
-                android:layout_height="1dp"
-                android:layout_width="match_parent"
-                style="@android:style/Widget.ProgressBar.Horizontal"
-                android:visibility="visible"
-                android:progressDrawable="@drawable/circular_progress_bar"
-                android:max="100"
-                android:id="@+id/send_progress_bar"/>
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

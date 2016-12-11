@@ -5,10 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -39,6 +42,7 @@ public class PresenterUploadManager implements LoaderManager.LoaderCallbacks<Lis
     private BroadcastReceiver receiver;
     private long lastRefreshTime;
     private int economy;
+    private RecyclerView.LayoutManager mLayoutManager;
     private static final int REFRESH_RATE = 3; // milliseconds
 
     public PresenterUploadManager(UploadView mView, UploadModel mModel, Context context, LoaderManager mLoaderManager) {
@@ -50,6 +54,22 @@ public class PresenterUploadManager implements LoaderManager.LoaderCallbacks<Lis
         this.mHandler = new Handler();
         this.lastRefreshTime = System.currentTimeMillis();
         this.economy = 0;
+        this.mUploadAdapter = new UploadAdapter();
+        this.mLayoutManager = null;
+    }
+
+    public void setRecyclerView(RecyclerView recyclerView){
+        // use a linear layout manager
+        if(mLayoutManager == null){
+            mLayoutManager = new LinearLayoutManager(mContext);
+            recyclerView.setLayoutManager(mLayoutManager);
+        }
+        recyclerView.setAdapter(mUploadAdapter);
+        recyclerView.setHasFixedSize(true);
+    }
+    
+    public UploadAdapter getAdapter(){
+            return mUploadAdapter;
     }
 
     public void setUploadAdapter(UploadAdapter a){
@@ -115,6 +135,7 @@ public class PresenterUploadManager implements LoaderManager.LoaderCallbacks<Lis
             totalLength = f.length();
         }
         mModel.addUpload(new Upload(f, totalLength, f.isDirectory(), 0));
+        this.updateModel(f.getAbsolutePath(), 0, 0);
         if(mView.isAdded()) {
             //mUploadLoader.onContentChanged();
 //            mLoaderManager.restartLoader(LOADER_ID, null, this);
@@ -123,6 +144,17 @@ public class PresenterUploadManager implements LoaderManager.LoaderCallbacks<Lis
             if (mUploadLoader.isStarted()) {
                 mUploadLoader.onContentChanged();
             }
+        }
+    }
+
+    public void addUploadTest() {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            File file = Environment.getExternalStorageDirectory();
+            String filePath = file.getAbsolutePath() + "/Dukto/" + "01-Introduction.pdf";
+            this.addUpload(new File(filePath));
+            //this.updateModel(filePath, 0, 0);
+            makeToast("filePath: " + filePath);
+            //this.updateUI();
         }
     }
 
@@ -164,10 +196,10 @@ public class PresenterUploadManager implements LoaderManager.LoaderCallbacks<Lis
         mUploadAdapter.notifyDataSetChanged();
     }
 
-    public void listItemClicked(ListView l, View rowView, int position, long id) {
+    public void listItemClicked(View rowView, int position) {
     }
 
-    public boolean longListItemClicked(AdapterView<?> adapter, View rowView, int position, long id) {
+    public boolean longListItemClicked(View rowView, int position) {
         return false;
     }
 
