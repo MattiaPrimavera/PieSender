@@ -58,6 +58,7 @@ public class FileView extends Fragment {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setAdapter(mFileAdapter);
         mPresenterFileManager.setFileAdapter(mFileAdapter);
+        mFileAdapter.setPresenterFileManager(mPresenterFileManager);
         setPresenterFileManager(mPresenterFileManager);
         mPresenterFileManager.init();
         recyclerView.setHasFixedSize(true);

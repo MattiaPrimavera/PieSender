@@ -9,12 +9,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.xtech.sultano.optimizedfilesender.presenter.PresenterFileManager;
+
 import java.io.File;
 import java.util.List;
 
 public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     private List<File> mObjects; //The List of objects we got from our model.
-    
+    private PresenterFileManager mPresenterFileManager;
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         private ImageView iv;
@@ -46,6 +50,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         super();
         Log.d("LOG34", "FileAdapter constructor");
         mObjects = o;
+        mPresenterFileManager = null;
     }
 
     public void clear(){
@@ -57,6 +62,10 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         mObjects.clear();
         mObjects.addAll(files);
         this.notifyItemRangeChanged(0, files.size());
+    }
+
+    public void setPresenterFileManager(PresenterFileManager presenterFileManager){
+        this.mPresenterFileManager = presenterFileManager;
     }
 
     public File getItem(int i) {
@@ -93,28 +102,38 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
         // - get element from your dataset at this position
             // - replace the contents of the view with that element
 
-            /*holder.txtHeader.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    remove(name);
-                }
-            });*/
-
-            File file = getItem(position);
-
-            /* If the file is a dir, set the image view's image to a folder, else, a file. */
-            if (file.isDirectory()) {
-                holder.iv.setImageResource(R.drawable.folder);
-            } else {
-                setFileTypeIcon(holder.iv, file);
-                holder.iv.setImageResource(R.drawable.pdf);
-                if (file.length() > 0) {
-                    holder.detailsView.setText(String.valueOf(file.length()));
-                }
+        final int pos = position;
+        holder.listItemInfo.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                mPresenterFileManager.listItemClicked(v, pos);
             }
+        });
 
-            //Finally, set the name of the file or directory.
-            holder.nameView.setText(file.getName());
+        holder.listItemInfo.setOnLongClickListener(new View.OnLongClickListener(){
+            @Override
+            public boolean onLongClick(View v){
+                mPresenterFileManager.longListItemClicked(v, pos);
+                return false;
+             }
+        });
+
+
+        File file = getItem(position);
+
+        /* If the file is a dir, set the image view's image to a folder, else, a file. */
+        if (file.isDirectory()) {
+            holder.iv.setImageResource(R.drawable.folder);
+        } else {
+            setFileTypeIcon(holder.iv, file);
+            holder.iv.setImageResource(R.drawable.pdf);
+            if (file.length() > 0) {
+                holder.detailsView.setText(String.valueOf(file.length()));
+            }
+        }
+
+        //Finally, set the name of the file or directory.
+        holder.nameView.setText(file.getName());
 //            holder.listItemInfo.bringToFront();
     }
 

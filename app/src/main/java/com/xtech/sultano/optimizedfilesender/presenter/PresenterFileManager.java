@@ -168,7 +168,7 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
 
     }
 
-    public void listItemClicked(ListView l, View rowView, int position, long id) {
+    public void listItemClicked(View rowView, int position) {
         //The file we clicked based on row position where we clicked.  I could probably word that better. :)
         File fileClicked = mFileAdapter.getItem(position);
         
@@ -254,7 +254,7 @@ public class PresenterFileManager implements LoaderManager.LoaderCallbacks<List<
         connect.show(mView.getActivity().getSupportFragmentManager(), "connect-dialog");
     }
 
-    public boolean longListItemClicked(AdapterView<?> adapter, View rowView, int position, long id) {
+    public boolean longListItemClicked(View rowView, int position) {
         //The file we clicked based on row position where we clicked.  I could probably word that better. :)
         File fileClicked = mFileAdapter.getItem(position);
 
