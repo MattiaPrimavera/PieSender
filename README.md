@@ -15,6 +15,9 @@ Android devices do not allow sending files via wifi but through wifi-direct, whi
 
 There already exist some other solutions which I had the chance to try out, such as [Dukto](https://play.google.com/store/apps/details?id=it.msec.dukto&hl=it), but I though I could achieve a better user experience, add a few extra functionalities, and in the meanwhile have fun and gain more insight into the android development world.
 
+## Screenshots
+![File Manager + Running transfers](https://github.com/MattiaPrimavera/PieSender/blob/master/screenshots/merged_screenshots.png)
+
 ## Main Functionalities
 - [X] Browse directories from your file system (having informations such as name and size for file system entries)
 - [X] Automatic network discovery (A simple network broadcast based protocol to automatically discover all avaiable devices)
