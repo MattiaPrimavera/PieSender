@@ -100,7 +100,7 @@ public class FileSenderService extends Service implements Observer{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "File Sender Service started ...", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "File Sender Service started ...", Toast.LENGTH_SHORT).show();
         Log.d("TEST10", "FileSenderService started");
 
         // Set the file path of the file to send inside the obj field of the Message
