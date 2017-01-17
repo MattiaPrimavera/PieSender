@@ -1,5 +1,6 @@
 # PieSender
 
+## Synopsis
 PieSender is an android file manager that allows easily transferring files or directories via wifi:
 - Android Device --> Personal Computer
 - Personal Computer --> Android Device
@@ -7,8 +8,7 @@ PieSender is an android file manager that allows easily transferring files or di
 
 The only requirement is for both devices to share the same connection.
 
-## Interest
-
+## Interest and Reason to be
 Android devices do not allow sending files via wifi but through wifi-direct, which is not provided by a wide range of devices. I wanted to make it easy to use wifi for most of android devices to transfer files, considering: 
 - most of them can create a wifi hotspot (allowing Android to Android transfers with no need of an intermediate router)  
 - all of them can connect to a wifi network (for Android --> Computer and Computer --> Android transfers)  
@@ -17,6 +17,7 @@ There already exist some other solutions which I had the chance to try out, such
 
 ## Main Functionalities
 - [X] Browse directories from your file system (having informations such as name and size for file system entries)
+- [X] Automatic network discovery (A simple network broadcast based protocol to automatically discover all avaiable devices)
 - [X] Send a single file
 - [X] Send multiple files (in parallel using threads)
 - [X] Receive multiple files (in parallel)
@@ -27,9 +28,18 @@ There already exist some other solutions which I had the chance to try out, such
 - [ ] Search top bar to look recursively into sub-directories
 - [ ] Search top bar REGEX file filtering
 
-## Architecture Tips
+## Architectural hints and design patterns
+- [Model-View-Presenter Pattern](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter)
+- [View Holder Pattern - Efficient view caching ](https://xjaphx.wordpress.com/2011/06/16/viewholder-pattern-caching-view-efficiently/)
+- [Recycler View - next generation ListView](https://developer.android.com/reference/android/support/v7/widget/RecyclerView.html)
+- File transfer demands handled with a queue (to limit parallel transfers number)
+- All transfer threads inform the model of their progress, while transfers view refresh within controlled rate (storing last refresh request timestamp one can ignore further requests within a delay)
+- [Services](https://developer.android.com/guide/components/services.html) handle background operations
+- Progress bar effect through view overlay (exploting transparence and background color)
+- Swipeable interface composed of 3 views: FileManager, Downloads, Uploads
 
-## To Read On
+
+## Some helpful sources to thank
 - [Android Databinding: Goodbye Presenter, hello ViewModel!](http://tech.vg.no/2015/07/17/android-databinding-goodbye-presenter-hello-viewmodel/)
 - [Android Code That Scales, With MVP](http://engineering.remind.com/android-code-that-scales/)
 - [Using an ArrayAdapter with ListView](https://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView)
@@ -38,21 +48,15 @@ There already exist some other solutions which I had the chance to try out, such
 - [Using the RecycleView](https://guides.codepath.com/android/using-the-recyclerview)
 - [RecycleView animations](https://www.sitepoint.com/mastering-complex-lists-with-the-android-recyclerview/)
 - [Bound Services](http://www.truiton.com/2014/11/bound-service-example-android/)
-## Sources
-For what it concerns MVP pattern:
 - [MVP for Android: how to organize the presentation layer](http://antonioleiva.com/mvp-android/)
-
-Others:
 - [ViewHolder pattern](https://guides.codepath.com/android/Using-an-ArrayAdapter-with-ListView#improving-performance-with-the-viewholder-pattern)
 - [Simple `ListFragment` with `ArrayAdapter`](http://www.tutorialsbuzz.com/2014/05/android-listfragment-using-arrayadapter.html)  
-- [Creting a File Browser in Android](http://forum.codecall.net/topic/79689-creating-a-file-browser-in-android/)
+- [Creating a File Browser in Android](http://forum.codecall.net/topic/79689-creating-a-file-browser-in-android/)
 - [File Sender and Receiver + File name](http://www.adp-gmbh.ch/blog/2004/november/15.html)
 - [Bytes -> Long  Conversion](http://stackoverflow.com/questions/1026761/how-to-convert-a-byte-array-to-its-numeric-value-java)
 - [Long -> Bytes Conversion](http://stackoverflow.com/questions/4485128/how-do-i-convert-long-to-byte-and-back-in-java)
 - [Network Discovery](http://michieldemey.be/blog/network-discovery-using-udp-broadcast/)
 - [Async Task Loaders](https://developer.android.com/reference/android/content/AsyncTaskLoader.html)
 - [Check connection available](http://stackoverflow.com/questions/5474089/how-to-check-currently-internet-connection-is-available-or-not-in-android)  
-
-Icons:
 - [Folder](http://www.flaticon.com/free-icon/folder_181524#term=folders&page=1&position=43)
 - [File Type Material pack](http://www.flaticon.com/packs/files-3)
