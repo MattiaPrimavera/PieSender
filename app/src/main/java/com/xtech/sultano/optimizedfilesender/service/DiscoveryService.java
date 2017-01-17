@@ -41,6 +41,7 @@ public class DiscoveryService extends Service{
                 .putExtra(EXTENDED_DISCOVERY_RESULT, discoveryResult);
         this.mLocalBroadCastManager.sendBroadcast(localIntent);
         Log.d("LOG19", "after sending back the response");
+        stopSelf();
     }
 
 
@@ -83,7 +84,6 @@ public class DiscoveryService extends Service{
     public int onStartCommand(Intent intent, int flags, int startId) {
         Toast.makeText(this, "DiscoveryService started ...", Toast.LENGTH_SHORT).show();
         Log.d("LOG19", "DiscoveryService onStartCommand");
-
 
         String serverName = intent.getExtras().getString(EXTENDED_SERVER_NAME);
         // For each start request, send a message to start a job and deliver the

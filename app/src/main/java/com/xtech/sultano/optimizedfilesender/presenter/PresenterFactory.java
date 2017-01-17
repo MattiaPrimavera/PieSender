@@ -3,9 +3,11 @@ package com.xtech.sultano.optimizedfilesender.presenter;
 import android.content.Context;
 import android.support.v4.app.LoaderManager;
 
+import com.xtech.sultano.optimizedfilesender.model.Model.ConnectModel;
 import com.xtech.sultano.optimizedfilesender.model.Model.DownloadModel;
 import com.xtech.sultano.optimizedfilesender.model.Model.UploadModel;
 import com.xtech.sultano.optimizedfilesender.model.Model.Model;
+import com.xtech.sultano.optimizedfilesender.view.ConnectView;
 import com.xtech.sultano.optimizedfilesender.view.DownloadView;
 import com.xtech.sultano.optimizedfilesender.view.UploadView;
 import com.xtech.sultano.optimizedfilesender.view.FileView;
@@ -29,11 +31,8 @@ public class PresenterFactory<T extends PresenterFileManager> {
     private PresenterUploadManager mPresenterUploadManager;
     private PresenterDownloadManager mPresenterDownloadManager;
 
-    public PresenterFactory(FileView uiView, UploadView uploadView, DownloadView downloadView, Context context, LoaderManager loaderManager){
-        mUiView = uiView;
+    public PresenterFactory(Context context, LoaderManager loaderManager){
         mContext = context;
-        mUploadView = uploadView;
-        mDownloadView = downloadView;
         mLoaderManager = loaderManager;
 
         this.createViews();

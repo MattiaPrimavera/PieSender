@@ -29,6 +29,10 @@ public class DownloadModel {
         return this.mDownloadList;
     }
 
+    public void setAllDownloads(List<Download> downloads){
+        this.mDownloadList = downloads;
+    }
+
     public void addDownload(Download d){
         this.mDownloadList.add(d);
     }

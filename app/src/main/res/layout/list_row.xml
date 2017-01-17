@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="?attr/listPreferredItemHeightSmall"
+    android:layout_height="?attr/listPreferredItemHeight"
     android:background="@android:color/black"
     android:paddingTop="0dip"
     android:paddingLeft="0dip"

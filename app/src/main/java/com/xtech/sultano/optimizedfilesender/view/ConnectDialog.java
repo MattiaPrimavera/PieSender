@@ -15,10 +15,13 @@ public class ConnectDialog extends DialogFragment implements Subject{
     private String[] discovered;
     private ArrayList<Observer> mObserverList;
 
+    public ConnectDialog(){}
+
     public ConnectDialog(String[] discovered){
         this.discovered = discovered;
         this.mObserverList = null;
     }
+    
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {

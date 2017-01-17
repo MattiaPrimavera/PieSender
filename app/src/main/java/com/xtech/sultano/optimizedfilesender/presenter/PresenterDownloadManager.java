@@ -21,6 +21,8 @@ import com.xtech.sultano.optimizedfilesender.model.Model.Download;
 import com.xtech.sultano.optimizedfilesender.model.Model.DownloadModel;
 import com.xtech.sultano.optimizedfilesender.server.FileReceiver;
 import com.xtech.sultano.optimizedfilesender.view.DownloadView;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,27 +44,31 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     private RecyclerView.LayoutManager mLayoutManager;
 
     public PresenterDownloadManager(DownloadView mView, DownloadModel mModel, Context context, LoaderManager mLoaderManager) {
+        Log.d("LOG40", "PresenterDownloadMaanger constructor");
         this.mView = mView;
         this.mLoaderManager = mLoaderManager;
         this.mModel = mModel;
         this.mData = new ArrayList<Download>();
         this.mContext = context;
         this.mHandler = new Handler();
-        this.lastRefreshTime = System.currentTimeMillis();
+        this.lastRefreshTime = 0;
         this.economy = 0;
         this.mDownloadAdapter = new DownloadAdapter();
         this.mLayoutManager = null;
     }
 
     public void setRecyclerView(RecyclerView recyclerView){
+        Log.d("LOG40", "PresenterDownloadMaanger setRecyclerView");
         // use a linear layout manager
         if(mLayoutManager == null){
             mLayoutManager = new LinearLayoutManager(mContext);
             recyclerView.setLayoutManager(mLayoutManager);
         }
         recyclerView.setAdapter(mDownloadAdapter);
-        recyclerView.setHasFixedSize(true);
+//        recyclerView.setHasFixedSize(true);
     }
+
+    public DownloadModel getModel(){ return this.mModel; }
 
     public DownloadAdapter getAdapter(){
         return mDownloadAdapter;
@@ -73,7 +79,7 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     }
 
     public void init() {
-
+        Log.d("LOG40", "PresenterDownloadMaanger init");
         this.startLoader();
         this.updateUI();
 
@@ -115,6 +121,7 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     }
 
     public synchronized void startLoader(){
+        Log.d("LOG40", "PresenterDownloadMaanger startLoader");
         /*
             Start the AsyncTaskLoader that will update the adapter for
             the ListView. We update the adapter in the onLoadFinished() callback.
@@ -128,6 +135,7 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     }
 
     public synchronized void addDownload(String filename, long filesize){
+        Log.d("LOG40", "PresenterDownloadMaanger addDownload");
         mModel.addDownload(new Download(filename, filesize));
         if(mView.isAdded()) {
             //mDownloadLoader.onContentChanged();
@@ -144,12 +152,14 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     }
 
     public synchronized void updateModel(String filePath, int progressStatus, long receivedData, long totalSize){
+        Log.d("LOG40", "PresenterDownloadMaanger updateModel");
         mModel.updateProgress(filePath, progressStatus, receivedData, totalSize);
         this.updateUI();
         //Log.d("LOGM", "updating Model --> PRESENTER DOWNLOAD MANAGER == " + Integer.toString(progressStatus));
     }
 
     public void updateUI(){
+        Log.d("LOG40", "PresenterDownloadMaanger updateUI");
         if(mView.isAdded()) {
             long currentTime = System.currentTimeMillis();
             long difference = currentTime - this.lastRefreshTime;
@@ -174,7 +184,7 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
 
     /*Called to update the Adapter with a new list of files when mCurrentDir changes.*/
     public synchronized void updateAdapter(List<Download> data) {
-        Log.d("LOGDownloader", "UPDATING ADAPTER");
+        Log.d("LOG40", "PresenterDownloadMaanger updateAdapter");
         //clear the old data.
         mDownloadAdapter.clear();
         mDownloadAdapter.setData(data);
@@ -209,6 +219,7 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     //Loader callbacks.
     @Override
     public Loader<List<Download>> onCreateLoader(int id, Bundle args) {
+        Log.d("LOG40", "PresenterDownloadMaanger onCreateLoader");
         this.mDownloadLoader = new DownloadLoader(mContext, mModel);
         return this.mDownloadLoader;
     }
@@ -217,7 +228,7 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     @Override
     public void onLoadFinished(Loader<List<Download>> loader, List<Download> data) {
         this.mData = data;
-        Log.d("LOG22", "LOAD FINISHED, Size: " + mData.size());
+        Log.d("LOG40", "PresenterDownloadMaanger onLoadFinished");
         /* My data source has changed so now the adapter needs to be reset to reflect the changes
         in the ListView.*/
         updateAdapter(data);
@@ -229,12 +240,31 @@ public class PresenterDownloadManager implements LoaderManager.LoaderCallbacks<L
     }
 
     public void onResume(){
-        Log.d("LOGDownloader", "onResume PresenterDownloadManager");
-        this.startLoader();
+        Log.d("LOG40", "PresenterDownloadMaanger onResume: data : " + Integer.toString(mModel.getDownloadNumber()));
+        mHandler.post(new Runnable() {
+            public void run() {
+                updateAdapter(mModel.getAllDownloads());
+            }
+        });
+
+//        this.startLoader();
+    }
+
+    public void onStart(){
+        Log.d("LOG40", "PresenterDownloadMaanger onStart");
     }
 
     public void onStop(){
-        Log.d("LOGDownloader", "onStop PresenterDownloadManager");
-        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(receiver);
+        Log.d("LOG40", "PresenterDownloadMaanger onStop");
+        //LocalBroadcastManager.getInstance(mContext).unregisterReceiver(receiver);
+    }
+
+    public void onSaveInstanceState(Bundle state) {
+        //state.putSerializable("model", (ArrayList<Download>)mModel.getAllDownloads());
+    }
+
+    public void restoreSavedInstance(Bundle state) {
+        //ArrayList<Download> allDownloads = (ArrayList<Download>)state.getSerializable("model");
+        //mModel.setAllDownloads(allDownloads);
     }
 }

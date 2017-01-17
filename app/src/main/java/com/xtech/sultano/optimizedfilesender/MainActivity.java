@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterFactory;
 import com.xtech.sultano.optimizedfilesender.server.FileReceiver;
 import com.xtech.sultano.optimizedfilesender.server.FileReceiverService;
+import com.xtech.sultano.optimizedfilesender.view.ConnectView;
 import com.xtech.sultano.optimizedfilesender.view.DownloadView;
 import com.xtech.sultano.optimizedfilesender.view.SettingsView;
 import com.xtech.sultano.optimizedfilesender.view.UploadView;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FileView mView;
     private UploadView mUploadView;
     private DownloadView mDownloadView;
+    private ConnectView mConnectView;
     private ViewPager mViewPager;
     private TabLayout tabLayout;
     private ActionBar actionBar;
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         currentFragment = null;
 
         mLoaderManager = getSupportLoaderManager();
-        mPresenterFactory = new PresenterFactory(mView, mUploadView, mDownloadView, this, mLoaderManager);
+        mPresenterFactory = new PresenterFactory(this, mLoaderManager);
 
         // Getting UI fragments from PresenterFactory
         mView = mPresenterFactory.getFileView();
@@ -68,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mView.setPresenterFileManager(mPresenterFactory.getPresenterFileManager());
         mUploadView.setPresenterUploadManager(mPresenterFactory.getPresenterUploadManager());
         mDownloadView.setPresenterDownloadManager(mPresenterFactory.getPresenterDownloadManager());
-
 
         // Graphical interface is composed by two views, accessible through a tabbed layout
         mSectionsPagerAdapter.addPage(mView, "ONE");
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(mDrawerToggle);
+        drawer.addDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -191,6 +192,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.nav_share) {
         } else if (id == R.id.nav_send) {
+            Log.d("LOG45", "Click : Menu -> connect view");
+            ConnectView connectView = ConnectView.newInstance();
+            this.replaceFragment(R.id.content_main, connectView);
         }else if(id == R.id.action_settings){
             Log.d("LOG28", "clicked on nav_connect");
             SettingsView settingsView = SettingsView.newInstance();

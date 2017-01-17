@@ -22,6 +22,11 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.ViewHo
         mObjects = new ArrayList<>();
     }
 
+    public DownloadAdapter(List<Download> downloads){
+        super();
+        mObjects = downloads;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         private ImageView iv;

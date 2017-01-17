@@ -6,22 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerListDownload"
-        android:background="@android:color/holo_red_light"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical" />
-
-    <!--- If there list is empty, display a text view that tells us that -->
-    <!--    <TextView
-+            android:id="@android:id/empty"
-+            android:layout_width="match_parent"
-+            android:layout_height="match_parent"
-+            android:gravity="center"
-+            android:background="@android:color/black"
-+            android:textColor="@android:color/white"
-+            android:textSize="32sp"
-+            android:text="No Transfer running"/>-->
 </RelativeLayout>

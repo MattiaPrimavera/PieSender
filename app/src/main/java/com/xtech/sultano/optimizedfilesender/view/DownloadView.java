@@ -15,34 +15,30 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.xtech.sultano.optimizedfilesender.DownloadAdapter;
+import com.xtech.sultano.optimizedfilesender.DownloadAdapter;
 import com.xtech.sultano.optimizedfilesender.R;
+import com.xtech.sultano.optimizedfilesender.model.Model.Download;
+import com.xtech.sultano.optimizedfilesender.model.Model.DownloadModel;
+import com.xtech.sultano.optimizedfilesender.model.Model.Model;
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterDownloadManager;
 import com.xtech.sultano.optimizedfilesender.presenter.PresenterFactory;
+
+import java.io.File;
+import java.util.List;
 
 public class DownloadView extends Fragment {
     //This is a passive view, so my mPresenterDownloadManager handles all of the updating, etc.
     private PresenterDownloadManager mPresenterDownloadManager;
-    private PresenterFactory mPresenterFactory;
     private DownloadAdapter mDownloadAdapter;
 
     public void setPresenterDownloadManager(PresenterDownloadManager p) {
         mPresenterDownloadManager = p;
-
-        /*I am not using this, but I like to enable it just in case I want to populate the overflow menu
-        with menu options
-         */
         setHasOptionsMenu(true);
         mPresenterDownloadManager.init();
     }
 
     public PresenterDownloadManager getmPresenterDownloadManager(){ return this.mPresenterDownloadManager; }
 
-    public void setPresenterFactory(PresenterFactory presenterFactory){ this.mPresenterFactory = presenterFactory; }
-
-    /**
-     * Returns a new instance of this fragment for the given section
-     * number.
-     */
     public static DownloadView newInstance() {
         DownloadView fragment = new DownloadView();
         return fragment;
@@ -52,6 +48,9 @@ public class DownloadView extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.download_fragment, container, false);
+        if(savedInstanceState != null){
+            mPresenterDownloadManager.restoreSavedInstance(savedInstanceState);
+        }
         RecyclerView recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerListDownload);
         mPresenterDownloadManager.setRecyclerView(recyclerView);
         return rootView;
@@ -61,29 +60,11 @@ public class DownloadView extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-/*        setPresenterDownloadManager(mPresenterFactory.getPresenterDownloadManager());
-        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapter, View v, int position, long id) {
-                mPresenterDownloadManager.longListItemClicked(adapter, v, position, id);
-                return true;
-            }
-        });*/
     }
 
     public void onBackPressed(){
         mPresenterDownloadManager.homePressed();
     }
-
-    //When we intercept a click, call through to the appropriate method in the mPresenterDownloadManager.
-/*    @Override
-    public void onListItemClick(ListView listView, android.view.View view, int position, long id) {
-        super.onListItemClick(listView, view, position, id);
-        mPresenterDownloadManager.listItemClicked(listView, view, position, id);
-    }*/
-
-
 
     /* Populate options menu and or action bar with menu from res/menu/menu_main.xml*/
     @Override
@@ -120,11 +101,18 @@ public class DownloadView extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        mPresenterDownloadManager.onStart();
     }
 
     @Override
     public void onResume(){
         super.onResume();
         mPresenterDownloadManager.onResume();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        mPresenterDownloadManager.onSaveInstanceState(state);
     }
 }
