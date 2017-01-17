@@ -1,4 +1,34 @@
-# OptimizedFileManager-Android-
+# PieSender
+
+PieSender is an android file manager that allows easily transferring files or directories via wifi:
+- Android Device --> Personal Computer
+- Personal Computer --> Android Device
+- Android Device --> Android Device
+
+The only requirement is for both devices to share the same connection.
+
+## Interest
+
+Android devices do not allow sending files via wifi but through wifi-direct, which is not provided by a wide range of devices. I wanted to make it easy to use wifi for most of android devices to transfer files, considering: 
+- most of them can create a wifi hotspot (allowing Android to Android transfers with no need of an intermediate router)  
+- all of them can connect to a wifi network (for Android --> Computer and Computer --> Android transfers)  
+
+There already exist some other solutions which I had the chance to try out, such as [Dukto](https://play.google.com/store/apps/details?id=it.msec.dukto&hl=it), but I though I could achieve a better user experience, add a few extra functionalities, and in the meanwhile have fun and gain more insight into the android development world.
+
+## Main Functionalities
+- [X] Browse directories from your file system (having informations such as name and size for file system entries)
+- [X] Send a single file
+- [X] Send multiple files (in parallel using threads)
+- [X] Receive multiple files (in parallel)
+- [X] Search top bar for filtering current directory 
+- [ ] Web server (By building it respecting the same API contract from my django file server project [cappuccino-server](https://github.com/MattiaPrimavera/cappuccino-server) I can simply make re-use of the client from that project [cappuccino-web](https://github.com/MattiaPrimavera/cappuccino-web) and statically serve that to any browser that can reach the Android device through the network): this would make possible to transfer files from and to a computer with no need of having the Desktop version of the app
+- [ ] Extra module for [cappuccino-server](https://github.com/MattiaPrimavera/cappuccino-server) if self-hosted on a RaspBerryPi
+- [ ] Tag directories to synchronize
+- [ ] Search top bar to look recursively into sub-directories
+- [ ] Search top bar REGEX file filtering
+
+## Architecture Tips
+
 ## To Read On
 - [Android Databinding: Goodbye Presenter, hello ViewModel!](http://tech.vg.no/2015/07/17/android-databinding-goodbye-presenter-hello-viewmodel/)
 - [Android Code That Scales, With MVP](http://engineering.remind.com/android-code-that-scales/)
